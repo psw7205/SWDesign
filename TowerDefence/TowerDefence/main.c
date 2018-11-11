@@ -10,8 +10,9 @@ void MySetCursor(int x, int y);
 void RemoveCursor();
 void RunGame();
 void StartGame();
-void ShoewHelp();
+void ShowHelp();
 void ExitGame();
+void DrawGameBoard();
 
 
 int main()
@@ -50,41 +51,42 @@ COORD MyGetCursor()
 
 void RunGame()
 {
-	system("mode con cols=100 lines=30");
+	system("mode con cols=150 lines=40");
 
 	while (1)
 	{
-		MySetCursor(20, 5);
+		MySetCursor(50, 5);
 		for (int i = 0; i < 11; i++)
 		{
 			for (int j = 0; j < 28; j++)
 			{
-				MySetCursor(20+j*2, 5+i);
+				MySetCursor(50+j*2, 5+i);
 				if (title[i][j] == 1)
 					printf("■");
 			}
 			printf("\n");
 		}
 
-	
-		MySetCursor(40, 20);
+		MySetCursor(70, 20);
 		printf("1 : PLAY GAME");
 
-		MySetCursor(40, 22);
+		MySetCursor(70, 22);
 		printf("2 : HELP");
 
-		MySetCursor(40, 24);
+		MySetCursor(70, 24);
 		printf("3 : EXIT");
 		
 		char selectMenu = getch();
 		
 		if (selectMenu == '1')
 		{
-			// 게임시작
+			StartGame();
+			break;
 		}
 		else if (selectMenu == '2')
 		{
-			// 도움말
+			ShowHelp();
+			break;
 		}
 		else if (selectMenu == '3')
 		{
@@ -101,11 +103,14 @@ void RunGame()
 void StartGame()
 {
 	system("cls");
+	DrawGameBoard();
+	
 }
 
-void ShoewHelp()
+void ShowHelp()
 {
 	system("cls");
+
 }
 
 void ExitGame()
@@ -116,4 +121,18 @@ void ExitGame()
 	printf("===================================\n");
 	printf("contact us : psw7205@gmail.com\n");
 	printf("https://github.com/psw7205/SWDesign\n");
+}
+
+void DrawGameBoard()
+{
+	for (int i = 0; i < 30; i++)
+	{
+		for (int j = 0; j < 60; j++)
+		{
+			MySetCursor(j * 2, i);
+			if (mapModel[i][j] == 1)
+				printf("#");
+		}
+		printf("\n");
+	}
 }
