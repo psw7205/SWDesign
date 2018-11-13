@@ -14,7 +14,7 @@ void MySetCursor(int x, int y);
 void RemoveCursor();
 void RunGame();
 void StartGame();
-void ShoewHelp();
+void ShowHelp();
 void ExitGame();
 void DrawGameBoard();
 void ShiftRight();
@@ -24,12 +24,9 @@ void ShiftUp();
 void KeyInput();
 int curPosX, curPosY;
 
-
 int main()
 {
-
 	RunGame();
-	getchar();
 
 	return 0;
 }
@@ -96,7 +93,8 @@ void RunGame()
 		}
 		else if (selectMenu == '2')
 		{
-			// µµ¿ò¸»
+			ShowHelp();
+			break;
 		}
 		else if (selectMenu == '3')
 		{
@@ -133,7 +131,7 @@ void StartGame()
 	}
 }
 
-void ShoewHelp()
+void ShowHelp()
 {
 	system("cls");
 }
