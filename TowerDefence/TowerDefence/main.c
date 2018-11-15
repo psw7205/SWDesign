@@ -23,10 +23,13 @@ void ShiftDown();
 void ShiftUp();
 void KeyInput();
 int curPosX, curPosY;
+void MakeTower();
 
 int main()
 {
+
 	RunGame();
+	getchar();
 
 	return 0;
 }
@@ -93,8 +96,7 @@ void RunGame()
 		}
 		else if (selectMenu == '2')
 		{
-			ShowHelp();
-			break;
+			// 紫遺蜓
 		}
 		else if (selectMenu == '3')
 		{
@@ -121,6 +123,18 @@ void StartGame()
 	printf("戌式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式戎\n");
 	MySetCursor(96, 27);
 	printf("ⅥⅥⅥⅥⅥⅥⅥⅥⅥⅥⅥⅥ");
+	MySetCursor(0, 4);
+	printf("＝");
+	MySetCursor(2, 4);
+	printf("＝");
+	MySetCursor(4, 4);
+	printf("＝");
+	MySetCursor(6, 4);
+	printf("＝");
+	MySetCursor(8, 4);
+	printf("＝");
+	MySetCursor(10, 4);
+	printf("＝");
 
 	while (1)
 	{
@@ -148,7 +162,7 @@ void ExitGame()
 
 void DrawGameBoard()
 {
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 40; i++)
 	{
 		for (int j = 0; j < 60; j++)
 		{
@@ -159,11 +173,12 @@ void DrawGameBoard()
 		printf("\n");
 	}
 }
-
 void ShiftRight()
 {
+
 	curPosX += 2;
 	MySetCursor(curPosX, curPosY);
+
 	return;
 }
 
@@ -172,7 +187,6 @@ void ShiftLeft()
 	curPosX -= 2;
 	MySetCursor(curPosX, curPosY);
 	return;
-
 }
 
 void ShiftDown()
@@ -186,15 +200,15 @@ void ShiftUp()
 {
 	curPosY--;
 	MySetCursor(curPosX, curPosY);
-	return;
 }
 
 void KeyInput()
 {
-	char key;
+	int key;
 
 	for (int i = 0; i < 20; i++)
 	{
+
 		if (_kbhit() != 0)
 		{
 
@@ -202,24 +216,40 @@ void KeyInput()
 
 			switch (key)
 			{
+
 			case LEFT:
+
 				ShiftLeft();
+
 				break;
+
 			case RIGHT:
+
 				ShiftRight();
+
 				break;
+
 			case UP:
+
 				ShiftUp();
+
 				break;
 			case DOWN:
 				ShiftDown();
 				break;
 
-			case 'q':
-				printf("≠");
+			case 'Q':
+				MakeTower();
 				break;
 			}
 		}
 		Sleep(10);
 	}
+}
+
+void MakeTower()
+{
+	printf("﹥");
+	MySetCursor(curPosX, curPosY - 1);
+	printf("≠");
 }
