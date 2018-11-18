@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <windows.h>
 #include <conio.h>
 #include <time.h>
@@ -62,7 +62,7 @@ COORD MyGetCursor()
 
 void RunGame()
 {
-	system("mode con cols=150 lines=40");
+	system("mode con cols=150 lines=44");
 
 	while (1)
 	{
@@ -73,7 +73,7 @@ void RunGame()
 			{
 				MySetCursor(50 + j * 2, 5 + i);
 				if (title[i][j] == 1)
-					printf("¡á");
+					printf("â– ");
 			}
 			printf("\n");
 		}
@@ -96,7 +96,7 @@ void RunGame()
 		}
 		else if (selectMenu == '2')
 		{
-			// µµ¿ò¸»
+			// ë„ì›€ë§
 		}
 		else if (selectMenu == '3')
 		{
@@ -114,27 +114,27 @@ void StartGame()
 {
 	system("cls");
 	DrawGameBoard();
-	MySetCursor(0, 22);
-	printf("¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤\n");
-	printf("¦¢ È­»ìÅ¸¿ö   - Q 100°ñµå             ÇöÀç °ñµå  - 300 ¦¢\n");
-	printf("¦¢ ´ëÆ÷Å¸¿ö   - W 200°ñµå             ½ºÅ×ÀÌÁö   -  1  ¦¢\n");
-	printf("¦¢ ½½·Î¿ìÅ¸¿ö - E 200 °ñµå                             ¦¢\n");
-	printf("¦¢ ¹Ì»çÀÏÅ¸¿ö - R 300 °ñµå            ÆøÅº       -  A  ¦¢\n");
-	printf("¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥\n");
-	MySetCursor(96, 27);
-	printf("¢¾¢¾¢¾¢¾¢¾¢¾¢¾¢¾¢¾¢¾¢¾¢¾");
+	MySetCursor(0, 26);
+	printf("â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”\n");
+	printf("â”‚ í™”ì‚´íƒ€ì›Œ   - Q 100ê³¨ë“œ             í˜„ì¬ ê³¨ë“œ  - 300 â”‚\n");
+	printf("â”‚ ëŒ€í¬íƒ€ì›Œ   - W 200ê³¨ë“œ             ìŠ¤í…Œì´ì§€   -  1  â”‚\n");
+	printf("â”‚ ìŠ¬ë¡œìš°íƒ€ì›Œ - E 200 ê³¨ë“œ                             â”‚\n");
+	printf("â”‚ ë¯¸ì‚¬ì¼íƒ€ì›Œ - R 300 ê³¨ë“œ            í­íƒ„       -  A  â”‚\n");
+	printf("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜\n");
+	MySetCursor(96, 31);
+	printf("â™¥â™¥â™¥â™¥â™¥â™¥â™¥â™¥â™¥â™¥â™¥â™¥");
 	MySetCursor(0, 4);
-	printf("¡×");
+	printf("Â§");
 	MySetCursor(2, 4);
-	printf("¡×");
-	MySetCursor(4, 4);
-	printf("¡×");
-	MySetCursor(6, 4);
-	printf("¡×");
+	printf("Â§");
+	MySetCursor(4, 5);
+	printf("Â§");
+	MySetCursor(6, 5);
+	printf("Â§");
 	MySetCursor(8, 4);
-	printf("¡×");
+	printf("Â§");
 	MySetCursor(10, 4);
-	printf("¡×");
+	printf("Â§");
 
 	while (1)
 	{
@@ -153,8 +153,8 @@ void ShowHelp()
 void ExitGame()
 {
 	system("cls");
-	printf("¼ÒÇÁÆ®¿ş¾î ±âÃÊ¼³°è 2¹İ 6Á¶\n");
-	printf("¹Ú»ó¿ì\nÀÌ´ÙÈÆ\nÀÌÁ¾¿ø\n¹ÚÃ¶¿ì\n");
+	printf("ì†Œí”„íŠ¸ì›¨ì–´ ê¸°ì´ˆì„¤ê³„ 2ë°˜ 6ì¡°\n");
+	printf("ë°•ìƒìš°\nì´ë‹¤í›ˆ\nì´ì¢…ì›\në°•ì² ìš°\n");
 	printf("===================================\n");
 	printf("contact us : psw7205@gmail.com\n");
 	printf("https://github.com/psw7205/SWDesign\n");
@@ -162,7 +162,7 @@ void ExitGame()
 
 void DrawGameBoard()
 {
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < 44; i++)
 	{
 		for (int j = 0; j < 60; j++)
 		{
@@ -175,10 +175,8 @@ void DrawGameBoard()
 }
 void ShiftRight()
 {
-
 	curPosX += 2;
 	MySetCursor(curPosX, curPosY);
-
 	return;
 }
 
@@ -208,36 +206,24 @@ void KeyInput()
 
 	for (int i = 0; i < 20; i++)
 	{
-
 		if (_kbhit() != 0)
 		{
-
 			key = _getch();
-
 			switch (key)
 			{
-
 			case LEFT:
-
 				ShiftLeft();
-
 				break;
-
 			case RIGHT:
-
 				ShiftRight();
-
 				break;
-
 			case UP:
-
 				ShiftUp();
-
 				break;
 			case DOWN:
 				ShiftDown();
 				break;
-
+			case 'q':
 			case 'Q':
 				MakeTower();
 				break;
@@ -249,7 +235,7 @@ void KeyInput()
 
 void MakeTower()
 {
-	printf("¡á");
+	printf("â– ");
 	MySetCursor(curPosX, curPosY - 1);
-	printf("¡Ú");
+	printf("â˜…");
 }
