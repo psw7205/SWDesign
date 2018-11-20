@@ -3,7 +3,8 @@
 #include <conio.h>
 #include <time.h>
 #include "ItemDesign.h"
-#include"Monsters.h"
+#include "Monsters.h"
+#include "Tower.h"
 #pragma warning (disable:4996)
 #define LEFT 75
 #define RIGHT 77
@@ -23,7 +24,8 @@ void ShiftDown();
 void ShiftUp();
 void printcurpos();
 void KeyInput();
-void MakeTower();
+void MakeTower(int type);
+void printHelpMenu();
 int curPosX, curPosY; //these variables are coordinates of the 'mapModel' array, not the coordinates of console screen
 void drawmob(int type);
 int mob1num, mob2num, mob3num, mob4num; //number of each monsters per wave
@@ -35,6 +37,7 @@ node *head3;
 node *head4;
 void generatemob(int type); //make mobs according to the parameter 'num' and link them to the head of the mob type(parameter 'type')
 void movemob(int type);
+int gold = 300;
 
 int main() {
 	start.X = 0; start.Y = 5;
@@ -117,12 +120,7 @@ void StartGame() {
 	system("cls");
 	DrawGameBoard();//draw the road of game screen
 	MySetCursor(0, 26);
-	printf("┌─────────────────────────────────────────────────────┐\n");
-	printf("│ 화살타워   - Q 100골드             현재 골드  - 300 │\n");
-	printf("│ 대포타워   - W 200골드             스테이지   -  1  │\n");
-	printf("│ 슬로우타워 - E 200 골드                             │\n");
-	printf("│ 미사일타워 - R 300 골드            폭탄       -  A  │\n");
-	printf("└─────────────────────────────────────────────────────┘\n");
+	printHelpMenu();
 	MySetCursor(96, 31);
 	printf("♥♥♥♥♥♥♥♥♥♥♥♥");
 	//draw game screen info and road
@@ -197,7 +195,10 @@ void KeyInput() {
 				ShiftDown();
 				break;
 			case 'q':
-				MakeTower();
+			case 'w':
+			case 'e':
+			case 'r':
+				MakeTower(key);
 				break;
 			case 'd':
 				if (stt == 0) 
@@ -289,8 +290,52 @@ void printcurpos() {
 	MySetCursor(curPosX, curPosY);
 }
 
-void MakeTower() {
+void MakeTower(int type) {
+	
 	if (mapModel[curPosY + 1][curPosX] == 0) {
-		printf("★");
+		switch (type)
+		{
+		case 'q':
+			if (gold < 100)
+				break;
+			printf("★");
+			mapModel[curPosY + 1][curPosX] = 'q';
+			gold -= 100;
+			break;
+		case 'w':
+			if (gold < 200)
+				break;
+			printf("☆");
+			mapModel[curPosY + 1][curPosX] = 'w';
+			gold -= 200;
+			break;
+		case 'e':
+			if (gold < 200)
+				break;
+			printf("◎");
+			mapModel[curPosY + 1][curPosX] = 'e';
+			gold -= 200;
+			break;
+		case 'r':
+			if (gold < 300)
+				break;
+			printf("◈");
+			mapModel[curPosY + 1][curPosX] = 'r';
+			gold -= 300;
+			break;
+		}
+		MySetCursor(0, 26);
+		printHelpMenu();
+
 	}
+}
+
+void printHelpMenu()
+{
+	printf("┌─────────────────────────────────────────────────────┐\n");
+	printf("│ 화살타워   - Q 100골드             현재 골드  - %4d│\n", gold);
+	printf("│ 대포타워   - W 200골드             스테이지   -  1  │\n");
+	printf("│ 슬로우타워 - E 200 골드                             │\n");
+	printf("│ 미사일타워 - R 300 골드            폭탄       -  A  │\n");
+	printf("└─────────────────────────────────────────────────────┘\n");
 }
