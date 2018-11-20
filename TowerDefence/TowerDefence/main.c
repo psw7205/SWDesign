@@ -223,7 +223,6 @@ void KeyInput()
 			case DOWN:
 				ShiftDown();
 				break;
-			case 'q':
 			case 'Q':
 				MakeTower();
 				break;
@@ -235,7 +234,8 @@ void KeyInput()
 
 void MakeTower()
 {
-	printf("■");
-	MySetCursor(curPosX, curPosY - 1);
-	printf("★");
+	if (mapModel[curPosY + 1][curPosX] == 0)
+	{
+		printf("★");
+	}
 }
