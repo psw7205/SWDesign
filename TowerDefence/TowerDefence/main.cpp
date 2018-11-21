@@ -38,6 +38,7 @@ node *head4;
 void generatemob(int type); //make mobs according to the parameter 'num' and link them to the head of the mob type(parameter 'type')
 void movemob(int type);
 int gold = 300;
+int life = 10;
 
 int main() {
 	start.X = 0; start.Y = 5;
@@ -61,7 +62,7 @@ void RemoveCursor() {
 }
 
 void MySetCursor(int x, int y) {
-	COORD pos = { x, y };
+	COORD pos = { (SHORT)x, (SHORT)y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
@@ -122,7 +123,8 @@ void StartGame() {
 	MySetCursor(0, 26);
 	printHelpMenu();
 	MySetCursor(96, 31);
-	printf("♥♥♥♥♥♥♥♥♥♥♥♥");
+	for(int i = 0; i < life; i++)
+		printf("♥");
 	//draw game screen info and road
 	mob1num = 30;//temporary number
 	generatemob(1);
@@ -292,35 +294,35 @@ void printcurpos() {
 
 void MakeTower(int type) {
 	
-	if (mapModel[curPosY + 1][curPosX] == 0) {
+	if (mapModel[curPosY + 1][curPosX/2] == 0) {
 		switch (type)
 		{
 		case 'q':
 			if (gold < 100)
 				break;
 			printf("★");
-			mapModel[curPosY + 1][curPosX] = 'q';
+			mapModel[curPosY + 1][curPosX/2] = 'q';
 			gold -= 100;
 			break;
 		case 'w':
 			if (gold < 200)
 				break;
 			printf("☆");
-			mapModel[curPosY + 1][curPosX] = 'w';
+			mapModel[curPosY + 1][curPosX/2] = 'w';
 			gold -= 200;
 			break;
 		case 'e':
 			if (gold < 200)
 				break;
 			printf("◎");
-			mapModel[curPosY + 1][curPosX] = 'e';
+			mapModel[curPosY + 1][curPosX/2] = 'e';
 			gold -= 200;
 			break;
 		case 'r':
 			if (gold < 300)
 				break;
 			printf("◈");
-			mapModel[curPosY + 1][curPosX] = 'r';
+			mapModel[curPosY + 1][curPosX/2] = 'r';
 			gold -= 300;
 			break;
 		}

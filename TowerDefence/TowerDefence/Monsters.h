@@ -8,7 +8,7 @@ typedef struct node {
 	int prevx;
 	int prevy;
 	int corner = -1;
-	char shape = '¢²';
+	char shape;
 	node*next;
 }node;
 
