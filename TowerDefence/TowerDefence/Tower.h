@@ -4,7 +4,6 @@ typedef struct Tower {
 	int ID;
 	int curx;
 	int cury;
-	int bulletSpeed;
 	int range;
 	Tower *next;
 }Tower;
@@ -19,19 +18,15 @@ Tower* SetTower(int ID, int x, int y) {
 	switch (ID)
 	{
 	case 'q':
-		tmp->bulletSpeed = 10;
 		tmp->range = 2;
 		break;
 	case 'w':
-		tmp->bulletSpeed = 20;
 		tmp->range = 4;
 		break;
 	case 'e':
-		tmp->bulletSpeed = 10;
 		tmp->range = 4;
 		break;
 	case 'r':
-		tmp->bulletSpeed = 30;
 		tmp->range = 8;
 		break;
 	}

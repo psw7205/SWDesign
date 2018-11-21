@@ -121,6 +121,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="ItemDesign.h" />
     <ClInclude Include="Monsters.h" />
     <ClInclude Include="Tower.h" />

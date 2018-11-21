@@ -5,6 +5,8 @@
 #include "ItemDesign.h"
 #include "Monsters.h"
 #include "Tower.h"
+#include "Bullet.h"
+
 #pragma warning (disable:4996)
 #define LEFT 75
 #define RIGHT 77
@@ -29,6 +31,7 @@ void PrintHelpMenu();
 void DrawMob(int type);
 void GenerateMob(int type); //make mobs according to the parameter 'num' and link them to the head of the mob type(parameter 'type')
 void MoveMob(int type);
+void Hit(int bx, int by, int ex, int ey, int *hp, int damage);
 
 int curPosX, curPosY; //these variables are coordinates of the 'mapModel' array, not the coordinates of console screen
 int mob1num, mob2num, mob3num, mob4num; //number of each monsters per wave
@@ -39,7 +42,8 @@ NPC *head2;
 NPC *head3;
 NPC *head4;
 Tower *TowerList;
-int gold = 300000;
+Bullet *BulletList;
+int gold = 9999;
 int life = 10;
 
 int main() {
@@ -135,14 +139,17 @@ void StartGame() {
 			KeyInput();
 			if (stt == 1) break;
 		}//when a wave is ended and player is installing the turret (break time)
+		
 		DrawMob(1);
 		MoveMob(1);
 		//Sleep(4);
 	}
 }
+
 void ShowHelp() {
 	system("cls");
 }
+
 void ExitGame() {
 	system("cls");
 	printf("소프트웨어 기초설계 2반 6조\n");
@@ -312,8 +319,8 @@ void MakeTower(int type) {
 				break;
 			printf("☆");
 			mapModel[curPosY + 1][curPosX/2] = 'w';
-			gold -= 200;
 			addTower(&TowerList, 'w', curPosY + 1, curPosX / 2);
+			gold -= 200;
 			break;
 		case 'e':
 			if (gold < 200)
@@ -328,13 +335,12 @@ void MakeTower(int type) {
 				break;
 			printf("◈");
 			mapModel[curPosY + 1][curPosX/2] = 'r';
-			gold -= 300;
 			addTower(&TowerList, 'r', curPosY + 1, curPosX / 2);
+			gold -= 300;
 			break;
 		}
 		MySetCursor(0, 26);
 		PrintHelpMenu();
-
 	}
 }
 
@@ -346,4 +352,17 @@ void PrintHelpMenu()
 	printf("│ 슬로우타워 - E 200 골드                             │\n");
 	printf("│ 미사일타워 - R 300 골드            폭탄       -  A  │\n");
 	printf("└─────────────────────────────────────────────────────┘\n");
+}
+
+void Hit(int bx, int by, int ex, int ey, int id, int *hp, int damage)
+{
+	if (bx == ex && by == ey)
+	{
+		*hp -= damage;
+		if (*hp < 0)
+		{
+			RemoveNum(head1, id);
+		}
+
+	}
 }
