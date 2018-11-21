@@ -9,7 +9,7 @@ typedef struct Tower {
 	Tower *next;
 }Tower;
 
-Tower* makeTower(int ID, int x, int y) {
+Tower* SetTower(int ID, int x, int y) {
 	Tower * tmp = (Tower *)malloc(sizeof(Tower));
 	tmp->ID = ID;
 	tmp->curx = x;
@@ -33,4 +33,15 @@ Tower* makeTower(int ID, int x, int y) {
 	}
 
 	return tmp;
+}
+
+void RemoveTowerNum(Tower *head, int i) {
+	Tower *cur = head->next;
+	Tower *prev = head;
+	for (int a = 0; a < i; a++) {
+		cur = cur->next;
+		prev = prev->next;
+	}
+	prev->next = cur->next;
+	free(cur);
 }

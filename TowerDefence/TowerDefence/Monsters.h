@@ -1,7 +1,7 @@
 #pragma once
 #include<stdlib.h>
 
-typedef struct node {
+typedef struct NPC {
 	int HP;
 	int curx;
 	int cury;
@@ -9,11 +9,11 @@ typedef struct node {
 	int prevy;
 	int corner = -1;
 	char shape;
-	node*next;
-}node;
+	NPC*next;
+}NPC;
 
-node* makemob(int hp, int x, int y, char s) {
-	node * make = (node *)malloc(sizeof(node));
+NPC* MakeMob(int hp, int x, int y, char s) {
+	NPC * make = (NPC *)malloc(sizeof(NPC));
 	make->HP = hp;
 	make->curx = x;
 	make->cury = y;
@@ -23,18 +23,18 @@ node* makemob(int hp, int x, int y, char s) {
 	return make;
 }
 
-void removeall(node*head) {
-	node*cur = head->next;
+void RemoveAll(NPC*head) {
+	NPC*cur = head->next;
 	while (cur->next != NULL) {
-		node*tmp = cur;
+		NPC*tmp = cur;
 		cur = cur->next;
 		free(tmp);
 	}
 }
 
-void removenum(node*head, int i) {
-	node *cur = head->next;
-	node *prev = head;
+void RemoveNum(NPC*head, int i) {
+	NPC *cur = head->next;
+	NPC *prev = head;
 	for (int a = 0; a < i; a++) {
 		cur = cur->next;
 		prev = prev->next;

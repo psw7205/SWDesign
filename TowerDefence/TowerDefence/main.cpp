@@ -22,32 +22,34 @@ void ShiftRight();
 void ShiftLeft();
 void ShiftDown();
 void ShiftUp();
-void printcurpos();
+void PrintCurPos();
 void KeyInput();
 void MakeTower(int type);
-void printHelpMenu();
+void PrintHelpMenu();
+void DrawMob(int type);
+void GenerateMob(int type); //make mobs according to the parameter 'num' and link them to the head of the mob type(parameter 'type')
+void MoveMob(int type);
+
 int curPosX, curPosY; //these variables are coordinates of the 'mapModel' array, not the coordinates of console screen
-void drawmob(int type);
 int mob1num, mob2num, mob3num, mob4num; //number of each monsters per wave
 int stt = 0;
 COORD start, end, first_corner;
-node *head1;
-node *head2;
-node *head3;
-node *head4;
-void generatemob(int type); //make mobs according to the parameter 'num' and link them to the head of the mob type(parameter 'type')
-void movemob(int type);
-int gold = 300;
+NPC *head1;
+NPC *head2;
+NPC *head3;
+NPC *head4;
+Tower *list;
+int gold = 300000;
 int life = 10;
 
 int main() {
 	start.X = 0; start.Y = 5;
 	first_corner.X = 110; first_corner.Y = 5;
 
-	head1 = makemob(1, 1, 1, 'a');
-	head2 = makemob(1, 1, 1, 'a');
-	head3 = makemob(1, 1, 1, 'a');
-	head4 = makemob(1, 1, 1, 'a');
+	head1 = MakeMob(1, 1, 1, 'a');
+	head2 = MakeMob(1, 1, 1, 'a');
+	head3 = MakeMob(1, 1, 1, 'a');
+	head4 = MakeMob(1, 1, 1, 'a');
 
 	RunGame();
 	getchar();
@@ -121,20 +123,20 @@ void StartGame() {
 	system("cls");
 	DrawGameBoard();//draw the road of game screen
 	MySetCursor(0, 26);
-	printHelpMenu();
+	PrintHelpMenu();
 	MySetCursor(96, 31);
 	for(int i = 0; i < life; i++)
 		printf("♥");
 	//draw game screen info and road
 	mob1num = 30;//temporary number
-	generatemob(1);
+	GenerateMob(1);
 	while (1) {
 		while (1) {
 			KeyInput();
 			if (stt == 1) break;
 		}//when a wave is ended and player is installing the turret (break time)
-		drawmob(1);
-		movemob(1);
+		DrawMob(1);
+		MoveMob(1);
 		//Sleep(4);
 	}
 }
@@ -210,13 +212,13 @@ void KeyInput() {
 		}
 		Sleep(10);
 	}
-	printcurpos();
+	PrintCurPos();
 }
 
-void generatemob(int type) {
+void GenerateMob(int type) {
 	if (type == 1) {
 		for (int i = 0; i < mob1num; i++) {
-			node*make = makemob(1, start.X, start.Y, 'a');//this paramter will be changed according to the mob design
+			NPC* make = MakeMob(1, start.X, start.Y, 'a');//this paramter will be changed according to the mob design
 			if (head1->next == NULL) head1->next = make;
 			else {
 				make->next = head1->next;
@@ -226,9 +228,9 @@ void generatemob(int type) {
 	}
 }//this method shlud be called when there is no node which is linked to head
 
-void drawmob(int type) {
+void DrawMob(int type) {
 	if (type == 1) {
-		node* cur = head1->next;
+		NPC* cur = head1->next;
 		for (int i = 0; i < mob1num; i++) {
 			MySetCursor(cur->prevx, cur->prevy);
 			printf(" ");
@@ -240,8 +242,8 @@ void drawmob(int type) {
 	MySetCursor(curPosX, curPosY);
 }
 
-void movemob(int type) {
-	node*cur = head1->next;
+void MoveMob(int type) {
+	NPC*cur = head1->next;
 	for (int i = 0; i < mob1num; i++) {
 		if (cur->cury == 5 && cur->curx < 112) {
 			cur->prevx = cur->curx; cur->prevy = cur->cury;
@@ -286,7 +288,7 @@ void movemob(int type) {
 	}
 }
 
-void printcurpos() {
+void PrintCurPos() {
 	MySetCursor(0, 40);
 	printf("%d %d", curPosX, curPosY);
 	MySetCursor(curPosX, curPosY);
@@ -327,12 +329,12 @@ void MakeTower(int type) {
 			break;
 		}
 		MySetCursor(0, 26);
-		printHelpMenu();
+		PrintHelpMenu();
 
 	}
 }
 
-void printHelpMenu()
+void PrintHelpMenu()
 {
 	printf("┌─────────────────────────────────────────────────────┐\n");
 	printf("│ 화살타워   - Q 100골드             현재 골드  - %4d│\n", gold);
