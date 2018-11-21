@@ -38,7 +38,7 @@ NPC *head1;
 NPC *head2;
 NPC *head3;
 NPC *head4;
-Tower *list;
+Tower *TowerList;
 int gold = 300000;
 int life = 10;
 
@@ -305,6 +305,7 @@ void MakeTower(int type) {
 			printf("★");
 			mapModel[curPosY + 1][curPosX/2] = 'q';
 			gold -= 100;
+			addTower(&TowerList, 'q', curPosY + 1, curPosX / 2);
 			break;
 		case 'w':
 			if (gold < 200)
@@ -312,12 +313,14 @@ void MakeTower(int type) {
 			printf("☆");
 			mapModel[curPosY + 1][curPosX/2] = 'w';
 			gold -= 200;
+			addTower(&TowerList, 'w', curPosY + 1, curPosX / 2);
 			break;
 		case 'e':
 			if (gold < 200)
 				break;
 			printf("◎");
 			mapModel[curPosY + 1][curPosX/2] = 'e';
+			addTower(&TowerList, 'e', curPosY + 1, curPosX / 2);
 			gold -= 200;
 			break;
 		case 'r':
@@ -326,6 +329,7 @@ void MakeTower(int type) {
 			printf("◈");
 			mapModel[curPosY + 1][curPosX/2] = 'r';
 			gold -= 300;
+			addTower(&TowerList, 'r', curPosY + 1, curPosX / 2);
 			break;
 		}
 		MySetCursor(0, 26);
