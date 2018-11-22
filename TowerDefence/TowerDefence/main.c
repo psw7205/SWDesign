@@ -127,7 +127,7 @@ void StartGame() {
 	MySetCursor(0, 26);
 	PrintHelpMenu();
 	MySetCursor(96, 31);
-	for(int i = 0; i < life; i++)
+	for (int i = 0; i < life; i++)
 		printf("♥");
 	//draw game screen info and road
 	mob1num = 30;//temporary number
@@ -137,7 +137,7 @@ void StartGame() {
 			KeyInput();
 			if (stt == 1) break;
 		}//when a wave is ended and player is installing the turret (break time)
-		
+
 		DrawMob(1);
 		MoveMob(1);
 		//Sleep(4);
@@ -166,25 +166,30 @@ void DrawGameBoard() {
 		printf("\n");
 	}
 } //draw the road of game screen
+
 void ShiftRight() {
 	curPosX += 2;
 	MySetCursor(curPosX, curPosY);
 	return;
 }
+
 void ShiftLeft() {
 	if (!(curPosX - 2 < 0))curPosX -= 2;
 	MySetCursor(curPosX, curPosY);
 	return;
 }
+
 void ShiftDown() {
 	curPosY++;
 	MySetCursor(curPosX, curPosY);
 	return;
 }
+
 void ShiftUp() {
 	curPosY--;
 	MySetCursor(curPosX, curPosY);
 }
+
 void KeyInput() {
 	int key;
 	for (int i = 0; i < 20; i++) {
@@ -210,12 +215,12 @@ void KeyInput() {
 				MakeTower(key);
 				break;
 			case 'd':
-				if (stt == 0) 
+				if (stt == 0)
 					stt = 1;
 				break;
 			}
 		}
-		Sleep(10);
+		Sleep(1);
 	}
 	PrintCurPos();
 }
@@ -223,7 +228,7 @@ void KeyInput() {
 void GenerateMob(int type) {
 	if (type == 1) {
 		for (int i = 0; i < mob1num; i++) {
-			NPC* make = MakeMob(1, start.X, start.Y, 'a');//this paramter will be changed according to the mob design
+			NPC* make = MakeMob(1, start.X + i * 2, start.Y, 'a');//this paramter will be changed according to the mob design
 			if (head1->next == NULL) head1->next = make;
 			else {
 				make->next = head1->next;
@@ -290,6 +295,16 @@ void MoveMob(int type) {
 			(cur->curx) += 2;
 			cur = cur->next;
 		}//goal
+		else
+		{
+			for (int i = 0; i < mob1num; i++) {
+				MySetCursor(cur->prevx, cur->prevy);
+				printf(" ");
+				MySetCursor(cur->curx, cur->cury);
+				cur = cur->next;
+				RemoveNum(head1, i);
+			}
+		}
 	}
 }
 
@@ -300,39 +315,50 @@ void PrintCurPos() {
 }
 
 void MakeTower(int type) {
-	
-	if (mapModel[curPosY + 1][curPosX/2] == 0) {
+
+	if (mapModel[curPosY + 2][curPosX / 2] == 0
+		&& mapModel[curPosY + 1][curPosX / 2] == 0
+		&& mapModel[curPosY + 1][curPosX / 2 + 1] == 0
+		&& mapModel[curPosY + 2][curPosX / 2 + 1] == 0) {
 		switch (type)
 		{
 		case 'q':
 			if (gold < 100)
 				break;
-			printf("★");
-			mapModel[curPosY + 1][curPosX/2] = 'q';
+			printf("q★");
+			MySetCursor(curPosX, curPosY+1);
+			printf("■■");
+			AddTowerMap('q', curPosY, curPosX);
 			gold -= 100;
 			addTower(&TowerList, 'q', curPosY + 1, curPosX / 2);
 			break;
 		case 'w':
 			if (gold < 200)
 				break;
-			printf("☆");
-			mapModel[curPosY + 1][curPosX/2] = 'w';
+			printf("w☆");
+			MySetCursor(curPosX, curPosY + 1);
+			printf("■■");
+			AddTowerMap('w', curPosY, curPosX);
 			addTower(&TowerList, 'w', curPosY + 1, curPosX / 2);
 			gold -= 200;
 			break;
 		case 'e':
 			if (gold < 200)
 				break;
-			printf("◎");
-			mapModel[curPosY + 1][curPosX/2] = 'e';
+			printf("e◎");
+			MySetCursor(curPosX, curPosY + 1);
+			printf("■■");
+			AddTowerMap('e', curPosY, curPosX);
 			addTower(&TowerList, 'e', curPosY + 1, curPosX / 2);
 			gold -= 200;
 			break;
 		case 'r':
 			if (gold < 300)
 				break;
-			printf("◈");
-			mapModel[curPosY + 1][curPosX/2] = 'r';
+			printf("r◈");
+			MySetCursor(curPosX, curPosY + 1);
+			printf("■■");
+			AddTowerMap('r', curPosY, curPosX);
 			addTower(&TowerList, 'r', curPosY + 1, curPosX / 2);
 			gold -= 300;
 			break;

@@ -64,3 +64,11 @@ void addTower(Tower **head, int type, int x, int y)
 	it->next = newTower;
 	return;
 }
+
+void AddTowerMap(int type, int y, int x)
+{
+	mapModel[y + 1][x / 2] = type;
+	mapModel[y + 2][x / 2] = type;
+	mapModel[y + 1][x / 2 + 1] = type;
+	mapModel[y + 2][x / 2 + 1] = type;
+}
