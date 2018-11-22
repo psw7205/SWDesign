@@ -31,7 +31,7 @@ void PrintHelpMenu();
 void DrawMob(int type);
 void GenerateMob(int type); //make mobs according to the parameter 'num' and link them to the head of the mob type(parameter 'type')
 void MoveMob(int type);
-void Hit(int bx, int by, int ex, int ey, int *hp, int damage);
+void Hit(int bx, int by, int ex, int ey, int id, int *hp, int damage);
 
 int curPosX, curPosY; //these variables are coordinates of the 'mapModel' array, not the coordinates of console screen
 int mob1num, mob2num, mob3num, mob4num; //number of each monsters per wave
@@ -71,8 +71,6 @@ void MySetCursor(int x, int y) {
 	COORD pos = { (SHORT)x, (SHORT)y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-
-void MySetCursor(COORD pos) { SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos); }
 
 COORD MyGetCursor() {
 	COORD curPoint;

@@ -5,7 +5,7 @@ typedef struct Tower {
 	int curx;
 	int cury;
 	int range;
-	Tower *next;
+	struct Tower *next;
 }Tower;
 
 Tower* SetTower(int ID, int x, int y) {

@@ -7,9 +7,9 @@ typedef struct NPC {
 	int cury;
 	int prevx;
 	int prevy;
-	int corner = -1;
+	int corner;
 	char shape;
-	NPC*next;
+	struct NPC*next;
 }NPC;
 
 NPC* MakeMob(int hp, int x, int y, char s) {
