@@ -380,5 +380,13 @@ void PrintHelpMenu()
 
 void Hit(int bx, int by, int ex, int ey, int id, int *hp, int damage)
 {
+	if (bx == ex && by == ey)
+	{
+		*hp -= damage;
+		if (*hp < 0)
+		{
+			RemoveNum(head1, id);
+		}
 
+	}
 }
