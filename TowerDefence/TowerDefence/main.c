@@ -48,6 +48,7 @@ int life = 10;
 
 int main() {
 	start.X = 0; start.Y = 5;
+	end.X = 118; end.Y = 28;
 	first_corner.X = 110; first_corner.Y = 5;
 
 	head1 = MakeMob(1, 1, 1, 'a');
@@ -295,15 +296,11 @@ void MoveMob(int type) {
 			(cur->curx) += 2;
 			cur = cur->next;
 		}//goal
-		else
-		{
-			for (int i = 0; i < mob1num; i++) {
-				MySetCursor(cur->prevx, cur->prevy);
-				printf(" ");
-				MySetCursor(cur->curx, cur->cury);
-				cur = cur->next;
-				RemoveNum(head1, i);
-			}
+		else if (cur->curx == end.X && cur->cury == end.Y) {
+			MySetCursor(cur->curx, cur->cury);
+			printf(" ");
+			RemoveNum(head1, i);
+			mob1num--;
 		}
 	}
 }
