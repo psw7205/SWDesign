@@ -1,44 +1,27 @@
 #pragma once
-#include<stdlib.h>
 
 typedef struct NPC {
-	int HP;
+	int hp;
 	int curx;
 	int cury;
-	int prevx;
-	int prevy;
-	int corner;
-	char shape;
-	struct NPC*next;
+	int move_flag;
+	char shape; // 몬스터 종류 플래그.
 }NPC;
-
-NPC* MakeMob(int hp, int x, int y, char s) {
-	NPC * make = (NPC *)malloc(sizeof(NPC));
-	make->HP = hp;
-	make->curx = x;
-	make->cury = y;
-	make->shape = s;
-	make->next = NULL;
-	make->corner = -1;
-	return make;
-}
-
-void RemoveAll(NPC*head) {
-	NPC*cur = head->next;
-	while (cur->next != NULL) {
-		NPC*tmp = cur;
-		cur = cur->next;
-		free(tmp);
+char monsterModel[][2][2] = {
+	{
+		{ 1, 1 },
+		{ 1, 1 }
+	},
+	{
+		{ 1, 1 },
+		{ 1, 1 }
+	},
+	{
+		{ 1, 1 },
+		{ 1, 1 }
+	},
+	{
+		{ 1, 1 },
+		{ 1, 1 }
 	}
-}
-
-void RemoveNum(NPC*head, int i) {
-	NPC *cur = head->next;
-	NPC *prev = head;
-	for (int a = 0; a < i; a++) {
-		cur = cur->next;
-		prev = prev->next;
-	}
-	prev->next = cur->next;
-	free(cur);
-}
+}; // 몬스터 종류 만들기.

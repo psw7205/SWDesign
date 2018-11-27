@@ -12,6 +12,7 @@
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
+
 COORD MyGetCursor();
 void MySetCursor(int x, int y);
 void RemoveCursor();
@@ -28,34 +29,21 @@ void PrintCurPos();
 void KeyInput();
 void MakeTower(int type);
 void PrintHelpMenu();
-void DrawMob(int type);
-void GenerateMob(int type); //make mobs according to the parameter 'num' and link them to the head of the mob type(parameter 'type')
-void MoveMob(int type);
 void Hit(int bx, int by, int ex, int ey, int id, int *hp, int damage);
 
+NPC* MakeMonster();
+int MoveMonster(NPC *mon);
+
 int curPosX, curPosY; //these variables are coordinates of the 'mapModel' array, not the coordinates of console screen
-int mob1num, mob2num, mob3num, mob4num; //number of each monsters per wave
-int stt = 0;
+int start_flag = 0;
+
 COORD start, end, first_corner;
-NPC *head1;
-NPC *head2;
-NPC *head3;
-NPC *head4;
 Tower *TowerList;
 Bullet *BulletList;
 int gold = 9999;
 int life = 10;
 
 int main() {
-	start.X = 0; start.Y = 5;
-	end.X = 118; end.Y = 28;
-	first_corner.X = 110; first_corner.Y = 5;
-
-	head1 = MakeMob(1, 1, 1, 'a');
-	head2 = MakeMob(1, 1, 1, 'a');
-	head3 = MakeMob(1, 1, 1, 'a');
-	head4 = MakeMob(1, 1, 1, 'a');
-
 	RunGame();
 	getchar();
 	return 0;
@@ -129,19 +117,23 @@ void StartGame() {
 	PrintHelpMenu();
 	MySetCursor(96, 31);
 	for (int i = 0; i < life; i++)
+	{
 		printf("♥");
-	//draw game screen info and road
-	mob1num = 30;//temporary number
-	GenerateMob(1);
-	while (1) {
-		while (1) {
-			KeyInput();
-			if (stt == 1) break;
-		}//when a wave is ended and player is installing the turret (break time)
+	}
 
-		DrawMob(1);
-		MoveMob(1);
-		//Sleep(4);
+	NPC *mon;
+	mon = MakeMonster();
+	while (1)
+	{
+		//if (isGameOver()) { break; }
+		while (1)
+		{
+			KeyInput();
+			if (start_flag == 1)
+			{
+				start_flag = MoveMonster(mon);
+			}
+		}
 	}
 }
 
@@ -215,9 +207,8 @@ void KeyInput() {
 			case 'r':
 				MakeTower(key);
 				break;
-			case 'd':
-				if (stt == 0)
-					stt = 1;
+			case 's':
+				start_flag = 1;
 				break;
 			}
 		}
@@ -226,84 +217,128 @@ void KeyInput() {
 	PrintCurPos();
 }
 
-void GenerateMob(int type) {
-	if (type == 1) {
-		for (int i = 0; i < mob1num; i++) {
-			NPC* make = MakeMob(1, start.X + i * 2, start.Y, 'a');//this paramter will be changed according to the mob design
-			if (head1->next == NULL) head1->next = make;
-			else {
-				make->next = head1->next;
-				head1->next = make;
+///// 몬스터 부분.
+NPC* MakeMonster() {
+	NPC *mon;
+	int i;
+	int size = 10; //
+	mon = (NPC*)malloc(size * sizeof(NPC));
+	for (i = 0; i < size; i++)
+	{
+		mon[i].curx = 0;
+		mon[i].cury = 4;
+		mon[i].hp = 100;
+		mon[i].shape = 0;
+		mon[i].move_flag = 1;
+	}
+	return mon;
+}
+
+void ShowMonster(char monsterInfo[2][2], int mx, int my) { // 1로 되어있는 곳을 보여준다.
+	int x, y;
+
+	for (y = 0; y < 2; y++) {
+		for (x = 0; x < 2; x++) {
+			MySetCursor(mx + (x * 2), my + y);
+
+			if (monsterInfo[y][x] == 1) {
+				printf("★");
 			}
 		}
 	}
-}//this method shlud be called when there is no node which is linked to head
-
-void DrawMob(int type) {
-	if (type == 1) {
-		NPC* cur = head1->next;
-		for (int i = 0; i < mob1num; i++) {
-			MySetCursor(cur->prevx, cur->prevy);
-			printf(" ");
-			MySetCursor(cur->curx, cur->cury);
-			printf("%c", cur->shape);
-			cur = cur->next;
-		}
-	}
-	MySetCursor(curPosX, curPosY);
+	MySetCursor(mx, my);
 }
 
-void MoveMob(int type) {
-	NPC*cur = head1->next;
-	for (int i = 0; i < mob1num; i++) {
-		if (cur->cury == 5 && cur->curx < 112) {
-			cur->prevx = cur->curx; cur->prevy = cur->cury;
-			(cur->curx) += 2;
-			cur = cur->next;
-		}//first corner
-		else if (cur->cury < 20 && cur->curx == 112) {
-			cur->prevx = cur->curx; cur->prevy = cur->cury;
-			(cur->cury) += 1;
-			cur = cur->next;
-		}//second corner
-		else if (cur->cury == 20 && 8 < cur->curx) {
-			cur->prevx = cur->curx; cur->prevy = cur->cury;
-			if (cur->curx == 62 && cur->cury == 20 && cur->corner == -1) {
-				(cur->curx) -= 2;
-				cur->corner = 1;
+void DeleteMonster(char monsterInfo[2][2], int mx, int my) { // 1로 되어있는 곳을 지운다.
+	int x, y;
+
+	for (y = 0; y < 2; y++) {
+		for (x = 0; x < 2; x++) {
+			MySetCursor(mx + (x * 2), my + y);
+
+			if (monsterInfo[y][x] == 1) {
+				printf(" ");
 			}
-			else if (cur->curx == 62 && cur->cury == 20 && cur->corner == 1)(cur->cury) += 1;
-			else (cur->curx) -= 2;
-			cur = cur->next;
-		}//third corner
-		else if (11 < cur->cury && 8 == cur->curx) {
-			cur->prevx = cur->curx; cur->prevy = cur->cury;
-			(cur->cury) -= 1;
-			cur = cur->next;
-		}//fourth corner
-		else if (11 == cur->cury && cur->curx < 62) {
-			cur->prevx = cur->curx; cur->prevy = cur->cury;
-			(cur->curx) += 2;
-			cur = cur->next;
-		}//fifth corner
-		else if (cur->cury < 28 && cur->curx == 62) {
-			cur->prevx = cur->curx; cur->prevy = cur->cury;
-			(cur->cury) += 1;
-			cur = cur->next;
-		}//sixth corner
-		else if (cur->cury == 28 && cur->curx < 118) {
-			cur->prevx = cur->curx; cur->prevy = cur->cury;
-			(cur->curx) += 2;
-			cur = cur->next;
-		}//goal
-		else if (cur->curx == end.X && cur->cury == end.Y) {
-			MySetCursor(cur->curx, cur->cury);
-			printf(" ");
-			RemoveNum(head1, i);
-			mob1num--;
 		}
 	}
+	MySetCursor(mx, my);
 }
+
+int MoveMonster(NPC *mon) {
+	int i = 0;
+	// for문으로 각각의 몬스터 그리기.
+
+	if (mon[i].move_flag == 1)
+	{
+		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		mon[i].curx = mon[i].curx + 2;
+		MySetCursor(mon[i].curx, mon[i].cury);
+		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		if (mon[i].curx == 110) { mon[i].move_flag = 2; }
+	}
+	if (mon[i].move_flag == 2)
+	{
+		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		mon[i].cury = mon[i].cury + 1;
+		MySetCursor(mon[i].curx, mon[i].cury);
+		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		if (mon[i].cury == 19) { mon[i].move_flag = 3; }
+	}
+	if (mon[i].move_flag == 3)
+	{
+		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		mon[i].curx = mon[i].curx - 2;
+		MySetCursor(mon[i].curx, mon[i].cury);
+		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		if (mon[i].curx == 8) { mon[i].move_flag = 4; }
+	}
+	if (mon[i].move_flag == 4)
+	{
+		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		mon[i].cury = mon[i].cury - 1;
+		MySetCursor(mon[i].curx, mon[i].cury);
+		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		if (mon[i].cury == 11) { mon[i].move_flag = 5; }
+	}
+	if (mon[i].move_flag == 5)
+	{
+		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		mon[i].curx = mon[i].curx + 2;
+		MySetCursor(mon[i].curx, mon[i].cury);
+		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		if (mon[i].curx == 60) { mon[i].move_flag = 6; }
+	}
+	if (mon[i].move_flag == 6)
+	{
+		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		mon[i].cury = mon[i].cury + 1;
+		MySetCursor(mon[i].curx, mon[i].cury);
+		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		if (mon[i].cury == 27) { mon[i].move_flag = 7; }
+	}
+	if (mon[i].move_flag == 7)
+	{
+		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		mon[i].curx = mon[i].curx + 2;
+		MySetCursor(mon[i].curx, mon[i].cury);
+		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		if (mon[i].curx == 118)
+		{
+			mon[i].move_flag = 0;
+			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		}
+	}
+	if (mon[i].move_flag == 0)
+	{
+		mon[i].move_flag = 1;
+		start_flag = 0; // 마지막 몬스터가 끝나면(없어지는건 예외) 끝
+		mon[i].curx = 0; // 사라지면 다시 x, y좌표 원래대로.
+		mon[i].cury = 4;
+		return 0;
+	}
+	return 1;
+}
+///// 몬스터 부분.
 
 void PrintCurPos() {
 	MySetCursor(0, 40);
@@ -322,8 +357,8 @@ void MakeTower(int type) {
 		case 'q':
 			if (gold < 100)
 				break;
-			printf("q★");
-			MySetCursor(curPosX, curPosY+1);
+			printf(" ★");
+			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('q', curPosY, curPosX);
 			gold -= 100;
@@ -332,7 +367,7 @@ void MakeTower(int type) {
 		case 'w':
 			if (gold < 200)
 				break;
-			printf("w☆");
+			printf(" ☆");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('w', curPosY, curPosX);
@@ -342,7 +377,7 @@ void MakeTower(int type) {
 		case 'e':
 			if (gold < 200)
 				break;
-			printf("e◎");
+			printf(" ◎");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('e', curPosY, curPosX);
@@ -352,7 +387,7 @@ void MakeTower(int type) {
 		case 'r':
 			if (gold < 300)
 				break;
-			printf("r◈");
+			printf(" ◈");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('r', curPosY, curPosX);

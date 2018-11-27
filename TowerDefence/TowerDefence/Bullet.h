@@ -1,6 +1,4 @@
 #pragma once
-#pragma once
-#include "Monsters.h"
 typedef struct Bullet
 {
 	int x;
