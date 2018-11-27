@@ -221,15 +221,17 @@ void KeyInput() {
 NPC* MakeMonster() {
 	NPC *mon;
 	int i;
+	int num = 0;
 	int size = 10; //
 	mon = (NPC*)malloc(size * sizeof(NPC));
 	for (i = 0; i < size; i++)
 	{
-		mon[i].curx = 0;
+		mon[i].curx = num;
 		mon[i].cury = 4;
 		mon[i].hp = 100;
 		mon[i].shape = 0;
 		mon[i].move_flag = 1;
+		num = num - 10;
 	}
 	return mon;
 }
@@ -266,75 +268,89 @@ void DeleteMonster(char monsterInfo[2][2], int mx, int my) { // 1로 되어있�
 
 int MoveMonster(NPC *mon) {
 	int i = 0;
-	// for문으로 각각의 몬스터 그리기.
-
-	if (mon[i].move_flag == 1)
+	for (i = 0; i < 10; i++)
 	{
-		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		mon[i].curx = mon[i].curx + 2;
-		MySetCursor(mon[i].curx, mon[i].cury);
-		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		if (mon[i].curx == 110) { mon[i].move_flag = 2; }
-	}
-	if (mon[i].move_flag == 2)
-	{
-		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		mon[i].cury = mon[i].cury + 1;
-		MySetCursor(mon[i].curx, mon[i].cury);
-		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		if (mon[i].cury == 19) { mon[i].move_flag = 3; }
-	}
-	if (mon[i].move_flag == 3)
-	{
-		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		mon[i].curx = mon[i].curx - 2;
-		MySetCursor(mon[i].curx, mon[i].cury);
-		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		if (mon[i].curx == 8) { mon[i].move_flag = 4; }
-	}
-	if (mon[i].move_flag == 4)
-	{
-		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		mon[i].cury = mon[i].cury - 1;
-		MySetCursor(mon[i].curx, mon[i].cury);
-		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		if (mon[i].cury == 11) { mon[i].move_flag = 5; }
-	}
-	if (mon[i].move_flag == 5)
-	{
-		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		mon[i].curx = mon[i].curx + 2;
-		MySetCursor(mon[i].curx, mon[i].cury);
-		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		if (mon[i].curx == 60) { mon[i].move_flag = 6; }
-	}
-	if (mon[i].move_flag == 6)
-	{
-		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		mon[i].cury = mon[i].cury + 1;
-		MySetCursor(mon[i].curx, mon[i].cury);
-		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		if (mon[i].cury == 27) { mon[i].move_flag = 7; }
-	}
-	if (mon[i].move_flag == 7)
-	{
-		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		mon[i].curx = mon[i].curx + 2;
-		MySetCursor(mon[i].curx, mon[i].cury);
-		ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		if (mon[i].curx == 118)
+		if (mon[i].move_flag == 1)
 		{
-			mon[i].move_flag = 0;
-			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			if (mon[i].curx >= 0)
+			{
+				DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			}
+			mon[i].curx = mon[i].curx + 2;
+			MySetCursor(mon[i].curx, mon[i].cury);
+			if (mon[i].curx >= 0)
+			{
+				ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			}
+			if (mon[i].curx == 110) { mon[i].move_flag = 2; }
 		}
-	}
-	if (mon[i].move_flag == 0)
-	{
-		mon[i].move_flag = 1;
-		start_flag = 0; // 마지막 몬스터가 끝나면(없어지는건 예외) 끝
-		mon[i].curx = 0; // 사라지면 다시 x, y좌표 원래대로.
-		mon[i].cury = 4;
-		return 0;
+		if (mon[i].move_flag == 2)
+		{
+			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			mon[i].cury = mon[i].cury + 1;
+			MySetCursor(mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			if (mon[i].cury == 19) { mon[i].move_flag = 3; }
+		}
+		if (mon[i].move_flag == 3)
+		{
+			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			mon[i].curx = mon[i].curx - 2;
+			MySetCursor(mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			if (mon[i].curx == 8) { mon[i].move_flag = 4; }
+		}
+		if (mon[i].move_flag == 4)
+		{
+			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			mon[i].cury = mon[i].cury - 1;
+			MySetCursor(mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			if (mon[i].cury == 11) { mon[i].move_flag = 5; }
+		}
+		if (mon[i].move_flag == 5)
+		{
+			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			mon[i].curx = mon[i].curx + 2;
+			MySetCursor(mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			if (mon[i].curx == 60) { mon[i].move_flag = 6; }
+		}
+		if (mon[i].move_flag == 6)
+		{
+			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			mon[i].cury = mon[i].cury + 1;
+			MySetCursor(mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			if (mon[i].cury == 27) { mon[i].move_flag = 7; }
+		}
+		if (mon[i].move_flag == 7)
+		{
+			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			mon[i].curx = mon[i].curx + 2;
+			MySetCursor(mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			if (mon[i].curx == 118)
+			{
+				mon[i].move_flag = 0;
+				DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+				mon[0].curx = 0; // 사라지면 다시 x, y좌표 원래대로.
+				mon[i].curx = mon[i - 1].curx - 10;
+				mon[i].cury = 4;
+			}
+		}
+		if (mon[9].move_flag == 0)
+		{
+			for (i = 0; i < 10; i++)
+			{
+				mon[i].move_flag = 1;
+			}
+
+			///// if 마지막 몬스터가 없어지거나 모든 몬스터가 없을 경우
+			start_flag = 0;
+			/////
+			return 0;
+		}
 	}
 	return 1;
 }
@@ -357,7 +373,7 @@ void MakeTower(int type) {
 		case 'q':
 			if (gold < 100)
 				break;
-			printf(" ★");
+			printf("q★");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('q', curPosY, curPosX);
@@ -367,7 +383,7 @@ void MakeTower(int type) {
 		case 'w':
 			if (gold < 200)
 				break;
-			printf(" ☆");
+			printf("w☆");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('w', curPosY, curPosX);
@@ -377,7 +393,7 @@ void MakeTower(int type) {
 		case 'e':
 			if (gold < 200)
 				break;
-			printf(" ◎");
+			printf("e◎");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('e', curPosY, curPosX);
@@ -387,7 +403,7 @@ void MakeTower(int type) {
 		case 'r':
 			if (gold < 300)
 				break;
-			printf(" ◈");
+			printf("r◈");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('r', curPosY, curPosX);
