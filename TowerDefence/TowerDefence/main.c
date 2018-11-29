@@ -29,18 +29,19 @@ void PrintCurPos();
 void KeyInput();
 void MakeTower(int type);
 void PrintHelpMenu();
-void Hit(int bx, int by, int ex, int ey, int id, int *hp, int damage);
+int DetectCollision(int posX, int posY, char monsterInfo[2][2]);
 
 NPC* MakeMonster();
-int MoveMonster(NPC *mon);
+int MoveMonster();
 
 int curPosX, curPosY; //these variables are coordinates of the 'mapModel' array, not the coordinates of console screen
 int start_flag = 0;
+int stageFlag = 0;
 
 COORD start, end, first_corner;
 Tower *TowerList;
 Bullet *BulletList;
-int gold = 9999;
+int gold = 200;
 int life = 10;
 
 int main() {
@@ -110,17 +111,30 @@ void RunGame() {
 		}
 	}
 }
-void StartGame() {
-	system("cls");
-	DrawGameBoard();//draw the road of game screen
-	MySetCursor(0, 26);
-	PrintHelpMenu();
+
+void printLife()
+{
+	MySetCursor(96, 31);
+	for (int i = 0; i < life + 1; i++)
+	{
+		printf("  ");
+	}
 	MySetCursor(96, 31);
 	for (int i = 0; i < life; i++)
 	{
 		printf("♥");
 	}
 
+}
+
+void StartGame() {
+	system("cls");
+	DrawGameBoard();//draw the road of game screen
+	MySetCursor(0, 26);
+	PrintHelpMenu();
+	printLife();
+	MySetCursor(0, 0);
+	printf("stage 시작");
 	NPC *mon;
 	mon = MakeMonster();
 	while (1)
@@ -128,11 +142,18 @@ void StartGame() {
 		//if (isGameOver()) { break; }
 		while (1)
 		{
-			KeyInput();
 			if (start_flag == 1)
 			{
+				MySetCursor(0, 0);
+				printf("stage 플레이 중");
 				start_flag = MoveMonster(mon);
+				Sleep(100);
 			}
+			else
+			{
+				KeyInput();
+			}
+
 		}
 	}
 }
@@ -186,6 +207,7 @@ void ShiftUp() {
 void KeyInput() {
 	int key;
 	for (int i = 0; i < 20; i++) {
+
 		if (_kbhit() != 0) {
 			key = _getch();
 			switch (key) {
@@ -212,7 +234,6 @@ void KeyInput() {
 				break;
 			}
 		}
-		Sleep(1);
 	}
 	PrintCurPos();
 }
@@ -224,7 +245,7 @@ NPC* MakeMonster() {
 	int num = 0;
 	int size = 10; //
 	mon = (NPC*)malloc(size * sizeof(NPC));
-	for (i = 0; i < size; i++)
+	for (i = 0; i < size - 1; i++)
 	{
 		mon[i].curx = num;
 		mon[i].cury = 4;
@@ -233,6 +254,14 @@ NPC* MakeMonster() {
 		mon[i].move_flag = 1;
 		num = num - 10;
 	}
+
+	mon[9].curx = num;
+	mon[9].cury = 4;
+	mon[9].hp = 200;
+	mon[9].shape = 0;
+	mon[9].move_flag = 1;
+	num = num - 10;
+
 	return mon;
 }
 
@@ -281,6 +310,18 @@ int MoveMonster(NPC *mon) {
 			if (mon[i].curx >= 0)
 			{
 				ShowMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+				///////
+				if (DetectCollision(mon[i].curx, mon[i].cury, monsterModel[0]) == 1)
+				{
+					printf("  ");
+					mon[i].hp = mon[i].hp - 10;
+					if (mon[i].hp <= 0) {
+						mon[i].move_flag = 0;
+						DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+					}
+					printf("%d", mon[i].hp);
+				}
+				///////
 			}
 			if (mon[i].curx == 110) { mon[i].move_flag = 2; }
 		}
@@ -341,13 +382,18 @@ int MoveMonster(NPC *mon) {
 		}
 		if (mon[9].move_flag == 0)
 		{
+			life--;
+
+			printLife();
 			for (i = 0; i < 10; i++)
 			{
 				mon[i].move_flag = 1;
+				mon[i].hp = 100;
 			}
 
 			///// if 마지막 몬스터가 없어지거나 모든 몬스터가 없을 경우
 			start_flag = 0;
+
 			/////
 			return 0;
 		}
@@ -362,6 +408,21 @@ void PrintCurPos() {
 	MySetCursor(curPosX, curPosY);
 }
 
+int DetectCollision(int posX, int posY, char monsterInfo[2][2]) { // 충돌체크.
+	int x, y;
+	int arrX = posX;
+	int arrY = posY;
+	for (x = 0; x < 2; x++) {
+		for (y = 0; y < 2; y++) {
+
+			if (towerModel[arrY + y][arrX + x] == 119) {
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
 void MakeTower(int type) {
 
 	if (mapModel[curPosY + 2][curPosX / 2] == 0
@@ -373,7 +434,7 @@ void MakeTower(int type) {
 		case 'q':
 			if (gold < 100)
 				break;
-			printf("q★");
+			printf(" ★");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('q', curPosY, curPosX);
@@ -383,7 +444,7 @@ void MakeTower(int type) {
 		case 'w':
 			if (gold < 200)
 				break;
-			printf("w☆");
+			printf(" ☆");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('w', curPosY, curPosX);
@@ -393,7 +454,7 @@ void MakeTower(int type) {
 		case 'e':
 			if (gold < 200)
 				break;
-			printf("e◎");
+			printf(" ◎");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('e', curPosY, curPosX);
@@ -403,7 +464,7 @@ void MakeTower(int type) {
 		case 'r':
 			if (gold < 300)
 				break;
-			printf("r◈");
+			printf(" ◈");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("■■");
 			AddTowerMap('r', curPosY, curPosX);
@@ -422,11 +483,6 @@ void PrintHelpMenu()
 	printf("│ 화살타워   - Q 100골드             현재 골드  - %4d│\n", gold);
 	printf("│ 대포타워   - W 200골드             스테이지   -  1  │\n");
 	printf("│ 슬로우타워 - E 200 골드                             │\n");
-	printf("│ 미사일타워 - R 300 골드            폭탄       -  A  │\n");
+	printf("│ 미사일타워 - R 300 골드            폭탄 - A 500 골드│\n");
 	printf("└─────────────────────────────────────────────────────┘\n");
-}
-
-void Hit(int bx, int by, int ex, int ey, int id, int *hp, int damage)
-{
-
 }
