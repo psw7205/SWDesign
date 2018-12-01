@@ -27,17 +27,17 @@ void ShiftUp();
 void PrintCurPos();
 void KeyInput();
 void PrintHelpMenu();
-void SelectTower(int type);
 void PrintLife();
-void IsGameOver();
+void SelectTower(int type);
 
 void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my);
 int curPosX, curPosY;
 int start_flag = 0;
 int DetectCollision(int posX, int posY);
 int MoveMonster(NPC *mon);
-void DC_chk(NPC *mon, int i);
+void DC_chk(NPC *mon);
 void InitMonster(NPC *mon, int i);
+void DeleteTower();
 
 COORD start, end, first_corner;
 
@@ -115,24 +115,10 @@ void RunGame() {
 		}
 	}
 }
-
-void PrintLife()
-{
-	MySetCursor(60, 35);
-	for (int i = 0; i < 10; i++)
-		printf("  ");
-	MySetCursor(60, 35);
-	for (int i = 0; i < life; i++)
-	{
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-		printf("♥");
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-	}
-}
-
 void StartGame() {
 	system("cls");
 	DrawGameBoard();//draw the road of game screen
+	MySetCursor(60, 35);
 	PrintLife();
 	MySetCursor(0, 32);
 	PrintHelpMenu();
@@ -158,14 +144,6 @@ void ShowHelp() {
 	system("cls");
 }
 
-void IsGameOver()
-{
-	system("cls");
-	printf("GameOver");
-	Sleep(100);
-	ExitGame();
-}
-
 void ExitGame() {
 	system("cls");
 	printf("소프트웨어 기초설계 2반 6조\n");
@@ -173,7 +151,6 @@ void ExitGame() {
 	printf("===================================\n");
 	printf("contact us : psw7205@gmail.com\n");
 	printf("https://github.com/psw7205/SWDesign\n");
-	exit(0);
 }
 void DrawGameBoard() {
 	for (int i = 0; i < 33; i++) {
@@ -188,6 +165,10 @@ void DrawGameBoard() {
 
 void ShiftRight() {
 	curPosX += 2;
+	if (curPosX > 84)
+	{
+		curPosX -= 2;
+	}
 	MySetCursor(curPosX, curPosY);
 	return;
 }
@@ -200,12 +181,20 @@ void ShiftLeft() {
 
 void ShiftDown() {
 	curPosY++;
+	if (curPosY > 30)
+	{
+		curPosY--;
+	}
 	MySetCursor(curPosX, curPosY);
 	return;
 }
 
 void ShiftUp() {
 	curPosY--;
+	if (curPosY < 0)
+	{
+		curPosY++;
+	}
 	MySetCursor(curPosX, curPosY);
 }
 
@@ -233,7 +222,16 @@ void KeyInput() {
 			case 'r':
 				SelectTower(key);
 				break;
+			case 'd':
+				DeleteTower();
+				break;
 			case 's':
+				if (life == 0)
+				{
+					life = 10;
+				}
+				MySetCursor(60, 35);
+				PrintLife();
 				start_flag = 1;
 				break;
 			}
@@ -252,46 +250,46 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 			MySetCursor(mx + (x * 2), my + y);
 			switch (shape)
 			{
-			case 0:
+			case 2:
 				if (monsterInfo[y][x] == 1) {
 					if (hp <= 60 && hp > 30)
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
-						printf("♨");
+						printf("火");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
 					else if (hp <= 30)
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
-						printf("♨");
+						printf("火");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
 					else
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
-						printf("♨");
+						printf("火");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
 				}
 				break;
-			case 1:
+			case 3:
 				if (monsterInfo[y][x] == 1) {
 					if (hp <= 60 && hp > 30)
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
-						printf("♬");
+						printf("木");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
 					else if (hp <= 30)
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
-						printf("♬");
+						printf("木");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
 					else
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
-						printf("♬");
+						printf("木");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
 				}
@@ -322,19 +320,31 @@ void InitMonster(NPC *mon, int i)
 	mon[i].move_flag = 0;
 	mon[i].curx = (-16 * i);
 	mon[i].cury = 3;
-	mon[i].hp = 100;
+	mon[i].hp = 200;
 }
-void DC_chk(NPC *mon, int i)
+void DC_chk(NPC *mon)
 {
-	int bullet = 0;
+	int bullet;
+	int type;
 	bullet = DetectCollision(mon->curx, mon->cury);
+	type = bullet / 10;
+	type %= 10;
+	if (type >= 4) { type = mon->shape; }
 	if (bullet != 0)
 	{
-		mon->hp = mon->hp - bullet;
-		if (mon->hp <= 0) {
-			DeleteMonster(monsterModel[0], mon->curx, mon->cury);
-			mon->move_flag = 0;
+		if (mon->shape == type)
+		{
+			mon->hp -= (bullet / 100);
+			if (mon->hp <= 0) {
+				DeleteMonster(monsterModel[0], mon->curx, mon->cury);
+				gold += 50;
+				mon->move_flag = 0;
+
+				MySetCursor(0, 32);
+				PrintHelpMenu();
+			}
 		}
+
 		printf("%d", mon->hp);
 	}
 }
@@ -355,7 +365,7 @@ int MoveMonster(NPC *mon) {
 			if (mon[i].curx >= 0)
 			{
 				ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
-				DC_chk(&mon[i], i);
+				DC_chk(&mon[i]);
 			}
 			if (mon[i].curx == 76) { mon[i].move_flag = 2; }
 		}
@@ -365,7 +375,7 @@ int MoveMonster(NPC *mon) {
 			mon[i].cury = mon[i].cury + 1;
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
-			DC_chk(&mon[i], i);
+			DC_chk(&mon[i]);
 			if (mon[i].cury == 19) { mon[i].move_flag = 3; }
 		}
 		if (mon[i].move_flag == 3)
@@ -374,7 +384,7 @@ int MoveMonster(NPC *mon) {
 			mon[i].curx = mon[i].curx - 2;
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
-			DC_chk(&mon[i], i);
+			DC_chk(&mon[i]);
 			if (mon[i].curx == 8) { mon[i].move_flag = 4; }
 		}
 		if (mon[i].move_flag == 4)
@@ -383,7 +393,7 @@ int MoveMonster(NPC *mon) {
 			mon[i].cury = mon[i].cury - 1;
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
-			DC_chk(&mon[i], i);
+			DC_chk(&mon[i]);
 			if (mon[i].cury == 11) { mon[i].move_flag = 5; }
 		}
 		if (mon[i].move_flag == 5)
@@ -392,7 +402,7 @@ int MoveMonster(NPC *mon) {
 			mon[i].curx = mon[i].curx + 2;
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
-			DC_chk(&mon[i], i);
+			DC_chk(&mon[i]);
 			if (mon[i].curx == 42) { mon[i].move_flag = 6; }
 		}
 		if (mon[i].move_flag == 6)
@@ -401,7 +411,7 @@ int MoveMonster(NPC *mon) {
 			mon[i].cury = mon[i].cury + 1;
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
-			DC_chk(&mon[i], i);
+			DC_chk(&mon[i]);
 			if (mon[i].cury == 27) { mon[i].move_flag = 7; }
 		}
 		if (mon[i].move_flag == 7)
@@ -410,16 +420,16 @@ int MoveMonster(NPC *mon) {
 			mon[i].curx = mon[i].curx + 2;
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
-			DC_chk(&mon[i], i);
+			DC_chk(&mon[i]);
 			if (mon[i].curx >= 80) // 몬스터가 끝까지 갔을 경우.
 			{
 				DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
 				InitMonster(mon, i);
-				life--;
-				PrintLife();
-				if (life == 0)
-					IsGameOver();
 				start_flag = 0;
+
+				life--;
+				MySetCursor(60, 35);
+				PrintLife();
 			}
 		}
 	}
@@ -437,8 +447,8 @@ int MoveMonster(NPC *mon) {
 ///// 몬스터 부분.
 
 void PrintCurPos() {
-	MySetCursor(80, 36);
-	printf("%d %d", curPosX, curPosY);
+	MySetCursor(78, 37);
+	printf("(%2d, %2d)", curPosX, curPosY);
 	MySetCursor(curPosX, curPosY);
 }
 
@@ -461,14 +471,26 @@ int DetectCollision(int posX, int posY) { // 충돌체크.
 
 void SelectTower(int type) {
 
-	if (TowerModel[curPosY + 1][curPosX / 2] != 1
-		&& TowerModel[curPosY][curPosX / 2] != 1
-		&& TowerModel[curPosY][curPosX / 2 + 1] != 1
-		&& TowerModel[curPosY + 1][curPosX / 2 + 1] != 1
-		&& TowerModel[curPosY + 1][curPosX / 2] != 2
-		&& TowerModel[curPosY][curPosX / 2] != 2
-		&& TowerModel[curPosY][curPosX / 2 + 1] != 2
-		&& TowerModel[curPosY + 1][curPosX / 2 + 1] != 2)
+	if (TowerModel[curPosY + 1][curPosX / 2] % 10 != 1
+		&& TowerModel[curPosY][curPosX / 2] % 10 != 1
+		&& TowerModel[curPosY][curPosX / 2 + 1] % 10 != 1
+		&& TowerModel[curPosY + 1][curPosX / 2 + 1] % 10 != 1
+		&& TowerModel[curPosY + 1][curPosX / 2] % 10 != 2
+		&& TowerModel[curPosY][curPosX / 2] % 10 != 2
+		&& TowerModel[curPosY][curPosX / 2 + 1] % 10 != 2
+		&& TowerModel[curPosY + 1][curPosX / 2 + 1] % 10 != 2
+		&& TowerModel[curPosY + 1][curPosX / 2] % 10 != 3
+		&& TowerModel[curPosY][curPosX / 2] % 10 != 3
+		&& TowerModel[curPosY][curPosX / 2 + 1] % 10 != 3
+		&& TowerModel[curPosY + 1][curPosX / 2 + 1] % 10 != 3
+		&& TowerModel[curPosY + 1][curPosX / 2] % 10 != 4
+		&& TowerModel[curPosY][curPosX / 2] % 10 != 4
+		&& TowerModel[curPosY][curPosX / 2 + 1] % 10 != 4
+		&& TowerModel[curPosY + 1][curPosX / 2 + 1] % 10 != 4
+		&& TowerModel[curPosY + 1][curPosX / 2] % 10 != 5
+		&& TowerModel[curPosY][curPosX / 2] % 10 != 5
+		&& TowerModel[curPosY][curPosX / 2 + 1] % 10 != 5
+		&& TowerModel[curPosY + 1][curPosX / 2 + 1] % 10 != 5)
 	{
 		switch (type)
 		{
@@ -484,7 +506,7 @@ void SelectTower(int type) {
 			gold -= 100;
 			break;
 		case 'w':
-			if (gold < 200)
+			if (gold < 100)
 				break;
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 			BuildTower(type, curPosX, curPosY);
@@ -492,38 +514,87 @@ void SelectTower(int type) {
 			MySetCursor(curPosX, curPosY + 1);
 			printf("◆◆");
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-			gold -= 200;
+			gold -= 100;
 			break;
 		case 'e':
 			if (gold < 200)
 				break;
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 			BuildTower(type, curPosX, curPosY);
-			printf(" ☆");
+			printf(" ★");
 			MySetCursor(curPosX, curPosY + 1);
-			printf("☆☆");
-			gold -= 300;
+			printf("★★");
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+			gold -= 200;
 			break;
 		case 'r':
 			if (gold < 300)
 				break;
 			BuildTower(type, curPosX, curPosY);
-			printf(" ★");
+			printf(" ◈");
 			MySetCursor(curPosX, curPosY + 1);
-			printf("★★");
-			gold -= 400;
+			printf("◈◈");
+			gold -= 300;
 			break;
 		}
 		MySetCursor(0, 32);
 		PrintHelpMenu();
 	}
 }
-
+void DeleteTower()
+{
+	int tx, ty;
+	tx = curPosX / 2;
+	ty = curPosY;
+	if (TowerModel[ty][tx] % 10 != 1 &&
+		TowerModel[ty][tx + 1] % 10 != 1 &&
+		TowerModel[ty + 1][tx] % 10 != 1 &&
+		TowerModel[ty + 1][tx + 1] % 10 != 1 &&
+		TowerModel[ty][tx] % 10 != 0 &&
+		TowerModel[ty][tx + 1] % 10 != 0 &&
+		TowerModel[ty + 1][tx] % 10 != 0 &&
+		TowerModel[ty + 1][tx + 1] % 10 != 0)
+	{
+		printf("    ");
+		MySetCursor(curPosX, curPosY + 1);
+		printf("    ");
+		DeleteBullet(curPosX, curPosY);
+		gold -= 50;
+		MySetCursor(0, 32);
+		PrintHelpMenu();
+	}
+}
 void PrintHelpMenu()
 {
 	printf("┌─────────────────────────────────────────────────────┐\n");
 	printf("│ 물 타워   - Q 100골드             현재 골드  - %4d │\n", gold);
-	printf("│ 불 타워   - W 200골드             스테이지   -  1   │\n");
-	printf("│ 풍 타워   - E 300 골드                              │\n");
-	printf("│ 뇌 타워   - R 400 골드            폭탄       -  A   │\n");
+	printf("│ 불 타워   - W 100골드             스테이지   -  1   │\n");
+	printf("│ 뇌 타워   - E 200 골드                              │\n");
+	printf("│ 올 타워   - R 300 골드                              │\n");
+	printf("│ 타워 삭제 - D -50 골드            폭탄       -  A   │\n");
 	printf("└─────────────────────────────────────────────────────┘\n");
+}
+
+void PrintLife()
+{
+	int i;
+	MySetCursor(60, 35);
+	if (life == 10)
+	{
+		for (i = 0; i < life; i++)
+		{
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+			printf("♥");
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+		}
+	}
+	else
+	{
+		for (i = 0; i < 10 - life; i++)
+		{
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+			printf("♡");
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+		}
+	}
 }

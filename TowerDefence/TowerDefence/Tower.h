@@ -43,54 +43,145 @@ void BuildTower(int type, int tx, int ty)
 	int bullet;
 	tx = tx / 2;
 	ch = type - ('a' - 'A');
-	if (ch == 'Q') { bullet = 100; }
-	else if (ch == 'W') { bullet = 100; }
-	else if (ch == 'E') { bullet = 200; }
-	else if (ch == 'R') { bullet = 500; }
+	if (ch == 'Q') { bullet = 1020; }
+	else if (ch == 'W') { bullet = 1030; }
+	else if (ch == 'E') { bullet = 2040; }
+	else if (ch == 'R') { bullet = 3050; }
 
-	if (TowerModel[ty][tx] != 2)
+	if (TowerModel[ty][tx] != 2 && TowerModel[ty][tx] != 3)
 	{
 		// Å¸¿ö ºÎºÐ
-		TowerModel[ty][tx] = 2;
-		TowerModel[ty][tx + 1] = 2;
-		TowerModel[ty + 1][tx] = 2;
-		TowerModel[ty + 1][tx + 1] = 2;
-
+		if (ch == 'Q')
+		{
+			TowerModel[ty][tx] += 2;
+			TowerModel[ty][tx + 1] += 2;
+			TowerModel[ty + 1][tx] += 2;
+			TowerModel[ty + 1][tx + 1] += 2;
+		}
+		else if (ch == 'W')
+		{
+			TowerModel[ty][tx] += 3;
+			TowerModel[ty][tx + 1] += 3;
+			TowerModel[ty + 1][tx] += 3;
+			TowerModel[ty + 1][tx + 1] += 3;
+		}
+		else if (ch == 'E')
+		{
+			TowerModel[ty][tx] += 4;
+			TowerModel[ty][tx + 1] += 4;
+			TowerModel[ty + 1][tx] += 4;
+			TowerModel[ty + 1][tx + 1] += 4;
+		}
+		else if (ch == 'R')
+		{
+			TowerModel[ty][tx] += 5;
+			TowerModel[ty][tx + 1] += 5;
+			TowerModel[ty + 1][tx] += 5;
+			TowerModel[ty + 1][tx + 1] += 5;
+		}
 
 		// ÃÑ¾ËºÎºÐ(µ¿)
-		TowerModel[ty][tx + 2] = (TowerModel[ty][tx + 2] + bullet) / 10;
-		TowerModel[ty][tx + 3] = (TowerModel[ty][tx + 3] + bullet) / 10;
-		TowerModel[ty + 1][tx + 2] = (TowerModel[ty + 1][tx + 2] + bullet) / 10;
-		TowerModel[ty + 1][tx + 3] = (TowerModel[ty + 1][tx + 3] + bullet) / 10;
+		TowerModel[ty][tx + 2] += bullet;
+		TowerModel[ty][tx + 3] += bullet;
+		TowerModel[ty + 1][tx + 2] += bullet;
+		TowerModel[ty + 1][tx + 3] += bullet;
 
 		// ÃÑ¾ËºÎºÐ(¼­)
 		if (tx - 1 >= 0)
 		{
-			TowerModel[ty][tx - 1] = (TowerModel[ty][tx - 1] + bullet) / 10;
-			TowerModel[ty + 1][tx - 1] = (TowerModel[ty + 1][tx - 1] + bullet) / 10;
+			TowerModel[ty][tx - 1] = TowerModel[ty][tx - 1] + bullet;
+			TowerModel[ty + 1][tx - 1] = TowerModel[ty + 1][tx - 1] + bullet;
 		}
 		if (tx - 2 >= 0)
 		{
-			TowerModel[ty][tx - 2] = (TowerModel[ty][tx - 2] + bullet) / 10;
-			TowerModel[ty + 1][tx - 2] = (TowerModel[ty + 1][tx - 2] + bullet) / 10;
+			TowerModel[ty][tx - 2] = TowerModel[ty][tx - 2] + bullet;
+			TowerModel[ty + 1][tx - 2] = TowerModel[ty + 1][tx - 2] + bullet;
 		}
 
 		// ÃÑ¾ËºÎºÐ(³²)
-		TowerModel[ty + 2][tx] = (TowerModel[ty + 2][tx] + bullet) / 10;
-		TowerModel[ty + 2][tx + 1] = (TowerModel[ty + 2][tx + 1] + bullet) / 10;
-		TowerModel[ty + 3][tx] = (TowerModel[ty + 3][tx] + bullet) / 10;
-		TowerModel[ty + 3][tx + 1] = (TowerModel[ty + 3][tx + 1] + bullet) / 10;
+		TowerModel[ty + 2][tx] = TowerModel[ty + 2][tx] + bullet;
+		TowerModel[ty + 2][tx + 1] = TowerModel[ty + 2][tx + 1] + bullet;
+		TowerModel[ty + 3][tx] = TowerModel[ty + 3][tx] + bullet;
+		TowerModel[ty + 3][tx + 1] = TowerModel[ty + 3][tx + 1] + bullet;
 
 		// ÃÑ¾ËºÎºÐ(ºÏ)
 		if (ty - 1 >= 0)
 		{
-			TowerModel[ty - 1][tx] = (TowerModel[ty - 1][tx] + bullet) / 10;
-			TowerModel[ty - 1][tx + 1] = (TowerModel[ty - 1][tx + 1] + bullet) / 10;
+			TowerModel[ty - 1][tx] = TowerModel[ty - 1][tx] + bullet;
+			TowerModel[ty - 1][tx + 1] = TowerModel[ty - 1][tx + 1] + bullet;
 		}
 		if (ty - 2 >= 0)
 		{
-			TowerModel[ty - 2][tx] = (TowerModel[ty - 2][tx] + bullet) / 10;
-			TowerModel[ty - 2][tx + 1] = (TowerModel[ty - 2][tx + 1] + bullet) / 10;
+			TowerModel[ty - 2][tx] = TowerModel[ty - 2][tx] + bullet;
+			TowerModel[ty - 2][tx + 1] = TowerModel[ty - 2][tx + 1] + bullet;
 		}
 	}
+}
+
+void DeleteBullet(int tx, int ty)
+{
+	int bullet;
+	int type;
+	tx = tx / 2;
+	type = TowerModel[ty][tx] % 10;
+	if (type == 2)
+	{
+		bullet = 1020;
+	}
+	else if (type == 3)
+	{
+		bullet = 1030;
+	}
+	else if (type == 4)
+	{
+		bullet = 2040;
+	}
+	else if (type == 5)
+	{
+		bullet = 3050;
+	}
+
+	// ÃÑ¾ËºÎºÐ(µ¿)
+	TowerModel[ty][tx + 2] = TowerModel[ty][tx + 2] - bullet;
+	TowerModel[ty][tx + 3] = TowerModel[ty][tx + 3] - bullet;
+	TowerModel[ty + 1][tx + 2] = TowerModel[ty + 1][tx + 2] - bullet;
+	TowerModel[ty + 1][tx + 3] = TowerModel[ty + 1][tx + 3] - bullet;
+
+	// ÃÑ¾ËºÎºÐ(¼­)
+	if (tx - 1 >= 0)
+	{
+		TowerModel[ty][tx - 1] = TowerModel[ty][tx - 1] - bullet;
+		TowerModel[ty + 1][tx - 1] = TowerModel[ty + 1][tx - 1] - bullet;
+	}
+	if (tx - 2 >= 0)
+	{
+		TowerModel[ty][tx - 2] = TowerModel[ty][tx - 2] - bullet;
+		TowerModel[ty + 1][tx - 2] = TowerModel[ty + 1][tx - 2] - bullet;
+	}
+
+	// ÃÑ¾ËºÎºÐ(³²)
+	TowerModel[ty + 2][tx] = TowerModel[ty + 2][tx] - bullet;
+	TowerModel[ty + 2][tx + 1] = TowerModel[ty + 2][tx + 1] - bullet;
+	TowerModel[ty + 3][tx] = TowerModel[ty + 3][tx] - bullet;
+	TowerModel[ty + 3][tx + 1] = TowerModel[ty + 3][tx + 1] - bullet;
+
+	// ÃÑ¾ËºÎºÐ(ºÏ)
+	if (ty - 1 >= 0)
+	{
+		TowerModel[ty - 1][tx] = TowerModel[ty - 1][tx] - bullet;
+		TowerModel[ty - 1][tx + 1] = TowerModel[ty - 1][tx + 1] - bullet;
+	}
+	if (ty - 2 >= 0)
+	{
+		TowerModel[ty - 2][tx] = TowerModel[ty - 2][tx] - bullet;
+		TowerModel[ty - 2][tx + 1] = TowerModel[ty - 2][tx + 1] - bullet;
+	}
+
+	// Å¸¿ö ºÎºÐ
+	TowerModel[ty][tx] -= type;
+	TowerModel[ty][tx + 1] -= type;
+	TowerModel[ty + 1][tx] -= type;
+	TowerModel[ty + 1][tx + 1] -= type;
+
+
 }

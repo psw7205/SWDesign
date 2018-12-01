@@ -37,14 +37,14 @@ NPC* MakeMonster() {
 	{
 		mon[i].curx = num;
 		mon[i].cury = 3;
-		mon[i].hp = 100;
+		mon[i].hp = 200;
 		if (i < 5)
 		{
-			mon[i].shape = 0;
+			mon[i].shape = 2;
 		}
 		else
 		{
-			mon[i].shape = 1;
+			mon[i].shape = 3;
 		}
 		mon[i].move_flag = 1;
 		num = num - 16;
