@@ -25,11 +25,11 @@ void ShiftLeft();
 void ShiftDown();
 void ShiftUp();
 void PrintCurPos();
-void KeyInput();
+void KeyInput(NPC *mon);
 void PrintHelpMenu();
 void PrintLife();
 void SelectTower(int type);
-
+int isGameOver();
 void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my);
 int curPosX, curPosY;
 int start_flag = 0;
@@ -38,6 +38,8 @@ int MoveMonster(NPC *mon);
 void DC_chk(NPC *mon);
 void InitMonster(NPC *mon, int i);
 void DeleteTower();
+void bomb(NPC *mon);
+void DeleteMonster(char monsterInfo[2][2], int mx, int my);
 
 COORD start, end, first_corner;
 
@@ -115,6 +117,7 @@ void RunGame() {
 		}
 	}
 }
+
 void StartGame() {
 	system("cls");
 	DrawGameBoard();//draw the road of game screen
@@ -126,19 +129,33 @@ void StartGame() {
 	NPC *mon;
 	mon = MakeMonster();
 
+
 	while (1)
 	{
-		//if (isGameOver()) { break; }
-		while (1)
+		if (isGameOver())
 		{
-			KeyInput();
-			if (start_flag == 1)
-			{
-				start_flag = MoveMonster(mon);
-			}
+			ExitGame();
+			break;
+		}
+
+		KeyInput(mon);
+		if (start_flag == 1)
+		{
+			start_flag = MoveMonster(mon);
 		}
 	}
+	
 }
+
+int isGameOver()
+{
+
+	if(life <= 0)
+		return 1;
+
+	return 0;
+}
+
 
 void ShowHelp() {
 	system("cls");
@@ -152,6 +169,7 @@ void ExitGame() {
 	printf("contact us : psw7205@gmail.com\n");
 	printf("https://github.com/psw7205/SWDesign\n");
 }
+
 void DrawGameBoard() {
 	for (int i = 0; i < 33; i++) {
 		for (int j = 0; j < 43; j++) {
@@ -198,7 +216,7 @@ void ShiftUp() {
 	MySetCursor(curPosX, curPosY);
 }
 
-void KeyInput() {
+void KeyInput(NPC *mon) {
 	int key;
 	for (int i = 0; i < 10; i++) {
 		if (_kbhit() != 0) {
@@ -233,6 +251,9 @@ void KeyInput() {
 				MySetCursor(60, 35);
 				PrintLife();
 				start_flag = 1;
+				break;
+			case 'a':
+				bomb(mon);
 				break;
 			}
 		}
@@ -301,6 +322,21 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 	MySetCursor(mx, my);
 }
 
+void bomb(NPC*mon) {
+	int i;
+	int bombprice = 2000;
+	if (gold < bombprice) return;
+	gold -= bombprice;
+
+	for (i = 0; i < 10; i++) {
+		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+		InitMonster(mon, i);// set up the in
+	}
+
+	MySetCursor(0, 32);
+	PrintHelpMenu();
+}
+
 void DeleteMonster(char monsterInfo[2][2], int mx, int my) { // 1로 되어있는 곳을 지운다.
 	int x, y;
 
@@ -315,6 +351,7 @@ void DeleteMonster(char monsterInfo[2][2], int mx, int my) { // 1로 되어있�
 	}
 	MySetCursor(mx, my);
 }
+
 void InitMonster(NPC *mon, int i)
 {
 	mon[i].move_flag = 0;
@@ -322,6 +359,7 @@ void InitMonster(NPC *mon, int i)
 	mon[i].cury = 3;
 	mon[i].hp = 200;
 }
+
 void DC_chk(NPC *mon)
 {
 	int bullet;
