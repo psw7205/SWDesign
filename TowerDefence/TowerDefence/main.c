@@ -144,13 +144,13 @@ void StartGame() {
 			start_flag = MoveMonster(mon);
 		}
 	}
-	
+
 }
 
 int isGameOver()
 {
 
-	if(life <= 0)
+	if (life <= 0)
 		return 1;
 
 	return 0;
@@ -253,7 +253,10 @@ void KeyInput(NPC *mon) {
 				start_flag = 1;
 				break;
 			case 'a':
-				bomb(mon);
+				if (start_flag == 1)
+				{
+					bomb(mon);
+				}
 				break;
 			}
 		}
@@ -273,13 +276,13 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 			{
 			case 2:
 				if (monsterInfo[y][x] == 1) {
-					if (hp <= 60 && hp > 30)
+					if (hp <= 120 && hp > 60) // %로 체력 설정 할 수 있으면 바꾸시오. 60%. 30%
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 						printf("火");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
-					else if (hp <= 30)
+					else if (hp <= 60)
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 						printf("火");
@@ -295,13 +298,13 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 				break;
 			case 3:
 				if (monsterInfo[y][x] == 1) {
-					if (hp <= 60 && hp > 30)
+					if (hp <= 120 && hp > 60)
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 						printf("木");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
-					else if (hp <= 30)
+					else if (hp <= 60)
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 						printf("木");
@@ -324,9 +327,31 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 
 void bomb(NPC*mon) {
 	int i;
-	int bombprice = 2000;
+	int bombprice = 1000;
 	if (gold < bombprice) return;
 	gold -= bombprice;
+
+	for (int i = 0; i < 33; i++) {
+		for (int j = 0; j < 43; j++) {
+			MySetCursor(j * 2, i);
+			if (mapModel[i][j] == 9)
+			{
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+				printf("★");
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+			}
+		}
+		printf("\n");
+	}
+	Sleep(100);
+	for (int i = 0; i < 33; i++) {
+		for (int j = 0; j < 43; j++) {
+			MySetCursor(j * 2, i);
+			if (mapModel[i][j] == 9)
+				printf(" ");
+		}
+		printf("\n");
+	}
 
 	for (i = 0; i < 10; i++) {
 		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
@@ -597,7 +622,7 @@ void DeleteTower()
 		MySetCursor(curPosX, curPosY + 1);
 		printf("    ");
 		DeleteBullet(curPosX, curPosY);
-		gold -= 50;
+		gold += 50;
 		MySetCursor(0, 32);
 		PrintHelpMenu();
 	}
@@ -605,11 +630,12 @@ void DeleteTower()
 void PrintHelpMenu()
 {
 	printf("┌─────────────────────────────────────────────────────┐\n");
-	printf("│ 물 타워   - Q 100골드             현재 골드  - %4d │\n", gold);
-	printf("│ 불 타워   - W 100골드             스테이지   -  1   │\n");
-	printf("│ 뇌 타워   - E 200 골드                              │\n");
-	printf("│ 올 타워   - R 300 골드                              │\n");
-	printf("│ 타워 삭제 - D -50 골드            폭탄       -  A   │\n");
+	printf("│ 물 타워   - Q  100 골드           현재 골드  - %4d │\n", gold);
+	printf("│ 불 타워   - W  100 골드           스테이지   -  1   │\n");
+	printf("│ 뇌 타워   - E  200 골드                             │\n");
+	printf("│ 올 타워   - R  300 골드                             │\n");
+	printf("│ 타워 삭제 - D  +50 골드                             │\n");
+	printf("│ 폭탄      - A 1000 골드                             │\n");
 	printf("└─────────────────────────────────────────────────────┘\n");
 }
 
