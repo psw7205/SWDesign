@@ -11,6 +11,7 @@
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
+#define SPEED 10
 
 COORD MyGetCursor();
 void MySetCursor(int x, int y);
@@ -260,7 +261,7 @@ void KeyInput(NPC *mon) {
 				break;
 			}
 		}
-		Sleep(1);
+		Sleep(SPEED);
 	}
 	PrintCurPos();
 }
@@ -343,6 +344,7 @@ void bomb(NPC*mon) {
 		}
 		printf("\n");
 	}
+
 	Sleep(100);
 	for (int i = 0; i < 33; i++) {
 		for (int j = 0; j < 43; j++) {
