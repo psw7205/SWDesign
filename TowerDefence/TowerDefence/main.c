@@ -11,7 +11,7 @@
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
-#define SPEED 1
+#define SPEED 10
 
 COORD MyGetCursor();
 void MySetCursor(int x, int y);
@@ -46,7 +46,6 @@ COORD start, end, first_corner;
 
 int gold = 9999;
 int life = 10;
-int Time = 600;
 
 int main() {
 	RunGame();
@@ -131,6 +130,7 @@ void StartGame() {
 	NPC *mon;
 	mon = MakeMonster();
 
+
 	while (1)
 	{
 		if (isGameOver())
@@ -140,21 +140,9 @@ void StartGame() {
 		}
 
 		KeyInput(mon);
-
-		if (Time <= 0) { start_flag = 1; Time = 600; }
-
 		if (start_flag == 1)
 		{
 			start_flag = MoveMonster(mon);
-		}
-		else
-		{
-			// Time
-			MySetCursor(68, 33);
-			printf("Time ???:%3ds", Time / 10);
-			Time--;
-			MySetCursor(curPosX, curPosY);
-			// Time
 		}
 	}
 
@@ -236,43 +224,25 @@ void KeyInput(NPC *mon) {
 			key = _getch();
 			switch (key) {
 			case LEFT:
-				if (start_flag == 0)
-				{
-					ShiftLeft();
-				}
+				ShiftLeft();
 				break;
 			case RIGHT:
-				if (start_flag == 0)
-				{
-					ShiftRight();
-				}
+				ShiftRight();
 				break;
 			case UP:
-				if (start_flag == 0)
-				{
-					ShiftUp();
-				}
+				ShiftUp();
 				break;
 			case DOWN:
-				if (start_flag == 0)
-				{
-					ShiftDown();
-				}
+				ShiftDown();
 				break;
 			case 'q':
 			case 'w':
 			case 'e':
 			case 'r':
-				if (start_flag == 0)
-				{
-					SelectTower(key);
-				}
+				SelectTower(key);
 				break;
 			case 'd':
-				if (start_flag == 0)
-				{
-					DeleteTower();
-				}
+				DeleteTower();
 				break;
 			case 's':
 				if (life == 0)
@@ -282,7 +252,6 @@ void KeyInput(NPC *mon) {
 				MySetCursor(60, 35);
 				PrintLife();
 				start_flag = 1;
-				Time = 600;
 				break;
 			case 'a':
 				if (start_flag == 1)
@@ -375,6 +344,7 @@ void bomb(NPC*mon) {
 		}
 		printf("\n");
 	}
+
 	Sleep(100);
 	for (int i = 0; i < 33; i++) {
 		for (int j = 0; j < 43; j++) {
