@@ -761,6 +761,8 @@ Moster* ColorAndDead(Moster *Fm)
 		if(m->hp == 0) {
 			Fm = deleteMoster(Fm,num);
 			m = Fm;
+			if (m == NULL)
+				return;
 			num--; /* ?為刪掉?隻怪物? num ?減少，這樣 num 的數量就不?確了 */
 			money+=(10*m->value);
 			score+=(5*m->value);
