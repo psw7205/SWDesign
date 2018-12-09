@@ -2,6 +2,7 @@
 
 typedef struct NPC {
 	int hp;
+	int max_hp;
 	int curx;
 	int cury;
 	int move_flag;
@@ -37,7 +38,8 @@ NPC* MakeMonster() {
 	{
 		mon[i].curx = num;
 		mon[i].cury = 3;
-		mon[i].hp = 200;
+		mon[i].hp = 100;
+		mon[i].max_hp = 100;
 		if (i < 5)
 		{
 			mon[i].shape = 2;

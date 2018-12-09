@@ -1,4 +1,22 @@
-﻿#include <stdio.h>
+﻿/*
+
+몬스터 : 불, 물, 나무, 보스(노멀)
+타워 : 불, 물, 나무, 노멀
+
+상성표: 불->나무, 물->불, 나무->물 (데미지 150%)
+		나무->불, 불->물, 물->나무 (데미지 50%)
+		그 외 (100%)
+
+스테이지1: 불5물5 (체력100)
+스테이지2: 불5물5 (체력150)
+스테이지3: 불4물4나무2 (체력150)
+스테이지4: 불4물4나무2 (체력200)
+스테이지5: 불3물3나무3보스1 (체력200)(보스체력300(모든공격50%))
+각각 상성나쁨(150%), 상성좋음(50%), 보통(100%)
+
+*/
+
+#include <stdio.h>
 #include <windows.h>
 #include <conio.h>
 #include <time.h>
@@ -11,7 +29,7 @@
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
-#define SPEED 1
+#define SPEED 10
 
 COORD MyGetCursor();
 void MySetCursor(int x, int y);
@@ -31,7 +49,7 @@ void PrintHelpMenu();
 void PrintLife();
 void SelectTower(int type);
 int isGameOver();
-void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my);
+void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, int my);
 int curPosX, curPosY;
 int start_flag = 0;
 int DetectCollision(int posX, int posY);
@@ -44,9 +62,10 @@ void DeleteMonster(char monsterInfo[2][2], int mx, int my);
 
 COORD start, end, first_corner;
 
-int gold = 9999;
+int gold = 500;
 int life = 10;
 int Time = 600;
+int Stage = 0;
 
 int main() {
 	RunGame();
@@ -122,14 +141,14 @@ void RunGame() {
 
 void StartGame() {
 	system("cls");
+	NPC *mon;
+	mon = MakeMonster();
+	Stage++;
 	DrawGameBoard();//draw the road of game screen
 	MySetCursor(60, 35);
 	PrintLife();
 	MySetCursor(0, 32);
 	PrintHelpMenu();
-
-	NPC *mon;
-	mon = MakeMonster();
 
 	while (1)
 	{
@@ -151,7 +170,7 @@ void StartGame() {
 		{
 			// Time
 			MySetCursor(68, 33);
-			printf("Time ???:%3ds", Time / 10);
+			printf("Time Limit:%3ds", Time / 10);
 			Time--;
 			MySetCursor(curPosX, curPosY);
 			// Time
@@ -162,7 +181,6 @@ void StartGame() {
 
 int isGameOver()
 {
-
 	if (life <= 0)
 		return 1;
 
@@ -196,7 +214,7 @@ void DrawGameBoard() {
 
 void ShiftRight() {
 	curPosX += 2;
-	if (curPosX > 84)
+	if (curPosX > 82)
 	{
 		curPosX -= 2;
 	}
@@ -298,7 +316,7 @@ void KeyInput(NPC *mon) {
 }
 
 ///// 몬스터 부분.
-void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { // 1로 되어있는 곳을 보여준다.
+void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, int my) { // 1로 되어있는 곳을 보여준다.
 	int x, y;
 
 	for (y = 0; y < 2; y++) {
@@ -308,13 +326,13 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 			{
 			case 2:
 				if (monsterInfo[y][x] == 1) {
-					if (hp <= 120 && hp > 60) // %로 체력 설정 할 수 있으면 바꾸시오. 60%. 30%
+					if ((hp <= ((max_hp / 10.0) * 6)) && (hp > ((max_hp / 10.0) * 3)))
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 						printf("火");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
-					else if (hp <= 60)
+					else if (hp <= ((max_hp / 10.0) * 6))
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 						printf("火");
@@ -330,13 +348,35 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 				break;
 			case 3:
 				if (monsterInfo[y][x] == 1) {
-					if (hp <= 120 && hp > 60)
+					if ((hp <= ((max_hp / 10.0) * 6)) && (hp > ((max_hp / 10.0) * 3)))
+					{
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+						printf("水");
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+					}
+					else if (hp <= ((max_hp / 10.0) * 6))
+					{
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+						printf("水");
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+					}
+					else
+					{
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
+						printf("水");
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+					}
+				}
+				break;
+			case 4:
+				if (monsterInfo[y][x] == 1) {
+					if ((hp <= ((max_hp / 10.0) * 6)) && (hp > ((max_hp / 10.0) * 3)))
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 						printf("木");
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 					}
-					else if (hp <= 60)
+					else if (hp <= ((max_hp / 10.0) * 6))
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 						printf("木");
@@ -350,8 +390,29 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 					}
 				}
 				break;
+			case 5:
+				if (monsterInfo[y][x] == 1) {
+					if ((hp <= ((max_hp / 10.0) * 6)) && (hp > ((max_hp / 10.0) * 3)))
+					{
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+						printf("王");
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+					}
+					else if (hp <= ((max_hp / 10.0) * 6))
+					{
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+						printf("王");
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+					}
+					else
+					{
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
+						printf("王");
+						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+					}
+				}
+				break;
 			}
-
 		}
 	}
 	MySetCursor(mx, my);
@@ -359,7 +420,7 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int mx, int my) { //
 
 void bomb(NPC*mon) {
 	int i;
-	int bombprice = 1000;
+	int bombprice = 500;
 	if (gold < bombprice) return;
 	gold -= bombprice;
 
@@ -386,8 +447,15 @@ void bomb(NPC*mon) {
 	}
 
 	for (i = 0; i < 10; i++) {
-		DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
-		InitMonster(mon, i);// set up the in
+		if (mon[i].curx > 0) // 맵에 있는 몬스터만 폭탄
+		{
+			mon[i].hp -= 200; // 폭탄 데미지
+		}
+		if (mon[i].hp <= 0) // 몬스터 hp0가 일경우
+		{
+			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
+			InitMonster(mon, i);// set up the in
+		}
 	}
 
 	MySetCursor(0, 32);
@@ -411,36 +479,165 @@ void DeleteMonster(char monsterInfo[2][2], int mx, int my) { // 1로 되어있�
 
 void InitMonster(NPC *mon, int i)
 {
-	mon[i].move_flag = 0;
-	mon[i].curx = (-16 * i);
-	mon[i].cury = 3;
-	mon[i].hp = 200;
+	if (Stage == 1) // 스테이지 2에서는 기존(체력업)
+	{
+		mon[i].move_flag = 0;
+		mon[i].curx = (-16 * i);
+		mon[i].cury = 3;
+		mon[i].hp = 150;
+		mon[i].max_hp = 150;
+	}
+	else if (Stage == 2) // 스테이지 3에서는 4,4,2(new속성)
+	{
+		mon[i].move_flag = 0;
+		mon[i].curx = (-16 * i);
+		mon[i].cury = 3;
+		mon[i].hp = 150;
+		mon[i].max_hp = 150;
+		if (i < 4)
+		{
+			mon[i].shape = 2;
+		}
+		else if (i < 8)
+		{
+			mon[i].shape = 3;
+		}
+		else
+		{
+			mon[i].shape = 4;
+		}
+	}
+	else if (Stage == 3) // 스테이지 5에서는 4,4,2(new속성) (체력업)
+	{
+		mon[i].move_flag = 0;
+		mon[i].curx = (-16 * i);
+		mon[i].cury = 3;
+		mon[i].hp = 200;
+		mon[i].max_hp = 200;
+		if (i < 4)
+		{
+			mon[i].shape = 2;
+		}
+		else if (i < 8)
+		{
+			mon[i].shape = 3;
+		}
+		else
+		{
+			mon[i].shape = 4;
+		}
+	}
+	else if (Stage == 4) // 스테이지 5에서는 3,3,3,1(보스추가)
+	{
+		mon[i].move_flag = 0;
+		mon[i].curx = (-16 * i);
+		mon[i].cury = 3;
+		mon[i].hp = 200;
+		mon[i].max_hp = 200;
+		if (i < 3)
+		{
+			mon[i].shape = 2;
+		}
+		else if (i < 6)
+		{
+			mon[i].shape = 3;
+		}
+		else if (i < 9)
+		{
+			mon[i].shape = 4;
+		}
+		else
+		{
+			mon[i].shape = 5;
+			mon[i].hp = 300;
+			mon[i].max_hp = 300;
+		}
+	}
 }
 
 void DC_chk(NPC *mon)
 {
 	int bullet;
-	int type;
-	bullet = DetectCollision(mon->curx, mon->cury);
-	type = bullet / 10;
-	type %= 10;
-	if (type >= 4) { type = mon->shape; }
-	if (bullet != 0)
+	int type; // 
+	int i;
+	for (i = 0; i < 2; i++) // 길 양쪽 체크
 	{
-		if (mon->shape == type)
+		if (mon->move_flag % 2 == 0) // 세로 길
 		{
-			mon->hp -= (bullet / 100);
-			if (mon->hp <= 0) {
-				DeleteMonster(monsterModel[0], mon->curx, mon->cury);
-				gold += 50;
-				mon->move_flag = 0;
-
-				MySetCursor(0, 32);
-				PrintHelpMenu();
-			}
+			bullet = DetectCollision(mon->curx + (i * 2), mon->cury);
 		}
+		else // 가로 길
+		{
+			bullet = DetectCollision(mon->curx, mon->cury + i);
+		}
+		type = bullet / 10;
+		type %= 10; // bullet의 10의자리는 몬스터 종류(Shape)
+		if (bullet != 0)
+		{
+			if (mon->shape == 5) // 보스는 100% 데미지
+			{
+				mon->hp -= (bullet / 100);
+				if (mon->hp <= 0) {
+					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
+					gold += 50;
+					mon->move_flag = 0;
 
-		printf("%d", mon->hp);
+					MySetCursor(0, 32);
+					PrintHelpMenu();
+				}
+			}
+			if ( // 150%의 데미지
+				(mon->shape == 2 && type == 4) ||
+				(mon->shape == 3 && type == 2) ||
+				(mon->shape == 4 && type == 3)
+				)
+			{
+				mon->hp -= ((bullet / 100) + ((bullet / 100) / 2));
+				if (mon->hp <= 0) {
+					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
+					gold += 50;
+					mon->move_flag = 0;
+
+					MySetCursor(0, 32);
+					PrintHelpMenu();
+				}
+			}
+			else if ( // 50%의 데미지
+				(mon->shape == 4 && type == 2) ||
+				(mon->shape == 2 && type == 3) ||
+				(mon->shape == 3 && type == 4) ||
+				(mon->shape == 5)
+				)
+			{
+				mon->hp -= ((bullet / 100) / 2);
+				if (mon->hp <= 0) {
+					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
+					gold += 50;
+					mon->move_flag = 0;
+
+					MySetCursor(0, 32);
+					PrintHelpMenu();
+				}
+			}
+			else if ( // 100%의 데미지
+				(mon->shape == 4 && type == 4) ||
+				(mon->shape == 3 && type == 3) ||
+				(mon->shape == 2 && type == 2)
+				)
+			{
+				mon->hp -= (bullet / 100);
+				if (mon->hp <= 0) {
+					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
+					gold += 50;
+					mon->move_flag = 0;
+
+					MySetCursor(0, 32);
+					PrintHelpMenu();
+				}
+			}
+
+			printf("%d", mon->hp);////////////////////////////////////////////////지우기★
+		}
 	}
 }
 
@@ -459,62 +656,62 @@ int MoveMonster(NPC *mon) {
 			MySetCursor(mon[i].curx, mon[i].cury);
 			if (mon[i].curx >= 0)
 			{
-				ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
+				ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 				DC_chk(&mon[i]);
 			}
-			if (mon[i].curx == 76) { mon[i].move_flag = 2; }
+			if (mon[i].curx == 76) { Sleep(50); mon[i].move_flag = 2; }
 		}
 		if (mon[i].move_flag == 2)
 		{
 			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
 			mon[i].cury = mon[i].cury + 1;
 			MySetCursor(mon[i].curx, mon[i].cury);
-			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].cury == 19) { mon[i].move_flag = 3; }
+			if (mon[i].cury == 19) { Sleep(50); mon[i].move_flag = 3; }
 		}
 		if (mon[i].move_flag == 3)
 		{
 			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
 			mon[i].curx = mon[i].curx - 2;
 			MySetCursor(mon[i].curx, mon[i].cury);
-			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].curx == 8) { mon[i].move_flag = 4; }
+			if (mon[i].curx == 8) { Sleep(50); mon[i].move_flag = 4; }
 		}
 		if (mon[i].move_flag == 4)
 		{
 			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
 			mon[i].cury = mon[i].cury - 1;
 			MySetCursor(mon[i].curx, mon[i].cury);
-			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].cury == 11) { mon[i].move_flag = 5; }
+			if (mon[i].cury == 11) { Sleep(50); mon[i].move_flag = 5; }
 		}
 		if (mon[i].move_flag == 5)
 		{
 			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
 			mon[i].curx = mon[i].curx + 2;
 			MySetCursor(mon[i].curx, mon[i].cury);
-			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].curx == 42) { mon[i].move_flag = 6; }
+			if (mon[i].curx == 42) { Sleep(50); mon[i].move_flag = 6; }
 		}
 		if (mon[i].move_flag == 6)
 		{
 			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
 			mon[i].cury = mon[i].cury + 1;
 			MySetCursor(mon[i].curx, mon[i].cury);
-			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].cury == 27) { mon[i].move_flag = 7; }
+			if (mon[i].cury == 27) { Sleep(50); mon[i].move_flag = 7; }
 		}
 		if (mon[i].move_flag == 7)
 		{
 			DeleteMonster(monsterModel[0], mon[i].curx, mon[i].cury);
 			mon[i].curx = mon[i].curx + 2;
 			MySetCursor(mon[i].curx, mon[i].cury);
-			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].curx, mon[i].cury);
+			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
 			if (mon[i].curx >= 80) // 몬스터가 끝까지 갔을 경우.
 			{
@@ -528,13 +725,26 @@ int MoveMonster(NPC *mon) {
 			}
 		}
 	}
-	if (mon[9].move_flag == 0)
+	if (mon[9].move_flag == 0
+		&& mon[0].move_flag == 0
+		&& mon[1].move_flag == 0
+		&& mon[2].move_flag == 0
+		&& mon[3].move_flag == 0
+		&& mon[4].move_flag == 0
+		&& mon[5].move_flag == 0
+		&& mon[6].move_flag == 0
+		&& mon[7].move_flag == 0
+		&& mon[8].move_flag == 0
+		)
 	{
 		for (i = 0; i < 10; i++)
 		{
 			InitMonster(mon, i);
 			mon[i].move_flag = 1;
 		}
+		Stage++;
+		MySetCursor(0, 32);
+		PrintHelpMenu();
 		return 0;
 	}
 	return 1;
@@ -548,18 +758,13 @@ void PrintCurPos() {
 }
 
 int DetectCollision(int posX, int posY) { // 충돌체크.
-	int x, y;
 	int dX, dY;
 	int tmp;
 	dX = posX / 2;
 	dY = posY;
-	for (x = 0; x < 2; x++) {
-		for (y = 0; y < 2; y++) {
-			tmp = TowerModel[dY + y][dX + x];
-			if (tmp != 1) {
-				return tmp;
-			}
-		}
+	tmp = TowerModel[dY][dX];
+	if (tmp != 1) {
+		return tmp;
 	}
 	return 0;
 }
@@ -592,7 +797,7 @@ void SelectTower(int type) {
 		case 'q':
 			if (gold < 100)
 				break;
-			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 			BuildTower(type, curPosX, curPosY);
 			printf(" ◆");
 			MySetCursor(curPosX, curPosY + 1);
@@ -603,7 +808,7 @@ void SelectTower(int type) {
 		case 'w':
 			if (gold < 100)
 				break;
-			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
 			BuildTower(type, curPosX, curPosY);
 			printf(" ◆");
 			MySetCursor(curPosX, curPosY + 1);
@@ -612,24 +817,24 @@ void SelectTower(int type) {
 			gold -= 100;
 			break;
 		case 'e':
-			if (gold < 200)
+			if (gold < 100)
 				break;
-			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
 			BuildTower(type, curPosX, curPosY);
-			printf(" ★");
+			printf(" ◆");
 			MySetCursor(curPosX, curPosY + 1);
-			printf("★★");
+			printf("◆◆");
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-			gold -= 200;
+			gold -= 100;
 			break;
 		case 'r':
-			if (gold < 300)
+			if (gold < 200)
 				break;
 			BuildTower(type, curPosX, curPosY);
 			printf(" ◈");
 			MySetCursor(curPosX, curPosY + 1);
 			printf("◈◈");
-			gold -= 300;
+			gold -= 200;
 			break;
 		}
 		MySetCursor(0, 32);
@@ -653,8 +858,11 @@ void DeleteTower()
 		printf("    ");
 		MySetCursor(curPosX, curPosY + 1);
 		printf("    ");
+		if (((TowerModel[ty + 2][tx]) / 10) % 10 == 5)
+			gold += 150;
+		else
+			gold += 50;
 		DeleteBullet(curPosX, curPosY);
-		gold += 50;
 		MySetCursor(0, 32);
 		PrintHelpMenu();
 	}
@@ -662,12 +870,12 @@ void DeleteTower()
 void PrintHelpMenu()
 {
 	printf("┌─────────────────────────────────────────────────────┐\n");
-	printf("│ 물 타워   - Q  100 골드           현재 골드  - %4d │\n", gold);
-	printf("│ 불 타워   - W  100 골드           스테이지   -  1   │\n");
-	printf("│ 뇌 타워   - E  200 골드                             │\n");
-	printf("│ 올 타워   - R  300 골드                             │\n");
-	printf("│ 타워 삭제 - D  +50 골드                             │\n");
-	printf("│ 폭탄      - A 1000 골드                             │\n");
+	printf("│ 火 타워   - Q  100 골드           현재 골드  - %4d │\n", gold);
+	printf("│ 水 타워   - W  100 골드           스테이지   - %1d    │\n", Stage);
+	printf("│ 木 타워   - E  100 골드                             │\n");
+	printf("│ 올 타워   - R  200 골드                             │\n");
+	printf("│ 타워 삭제 - D +50%% 골드                             │\n");
+	printf("│ 폭탄      - A  500 골드                             │\n");
 	printf("└─────────────────────────────────────────────────────┘\n");
 }
 
