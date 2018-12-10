@@ -46,7 +46,7 @@ void BuildTower(int type, int tx, int ty)
 	if (ch == 'Q') { bullet = 1020; }
 	else if (ch == 'W') { bullet = 1030; }
 	else if (ch == 'E') { bullet = 1040; }
-	else if (ch == 'R') { bullet = 2050; }
+	else if (ch == 'R') { bullet = 1050; }
 
 	if (TowerModel[ty][tx] != 2 && TowerModel[ty][tx] != 3)
 	{
@@ -138,7 +138,7 @@ void DeleteBullet(int tx, int ty)
 	}
 	else if (type == 5)
 	{
-		bullet = 2050;
+		bullet = 1050;
 	}
 
 	// ÃÑ¾ËºÎºÐ(µ¿)

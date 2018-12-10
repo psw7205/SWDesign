@@ -29,7 +29,7 @@
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
-#define SPEED 10
+#define SPEED 1
 
 COORD MyGetCursor();
 void MySetCursor(int x, int y);
@@ -574,22 +574,11 @@ void DC_chk(NPC *mon)
 		type %= 10; // bullet의 10의자리는 몬스터 종류(Shape)
 		if (bullet != 0)
 		{
-			if (mon->shape == 5) // 보스는 100% 데미지
-			{
-				mon->hp -= (bullet / 100);
-				if (mon->hp <= 0) {
-					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
-					gold += 50;
-					mon->move_flag = 0;
-
-					MySetCursor(0, 32);
-					PrintHelpMenu();
-				}
-			}
 			if ( // 150%의 데미지
 				(mon->shape == 2 && type == 4) ||
 				(mon->shape == 3 && type == 2) ||
-				(mon->shape == 4 && type == 3)
+				(mon->shape == 4 && type == 3) ||
+				(type == 5)
 				)
 			{
 				mon->hp -= ((bullet / 100) + ((bullet / 100) / 2));
