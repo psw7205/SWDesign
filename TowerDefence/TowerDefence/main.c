@@ -29,7 +29,7 @@
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
-#define SPEED 1
+#define SPEED 10
 
 COORD MyGetCursor();
 void MySetCursor(int x, int y);
@@ -62,9 +62,9 @@ void DeleteMonster(char monsterInfo[2][2], int mx, int my);
 
 COORD start, end, first_corner;
 
-int gold = 500;
+int gold = 5000;
 int life = 10;
-int Time = 600;
+int Time = 150;
 int Stage = 0;
 
 int main() {
@@ -96,7 +96,7 @@ COORD MyGetCursor() {
 	return curPoint;
 }
 void RunGame() {
-	system("mode con cols=86 lines=44");
+	system("mode con cols=86 lines=42");
 	while (1) {
 		MySetCursor(16, 5);
 		for (int i = 0; i < 11; i++) {
@@ -160,7 +160,7 @@ void StartGame() {
 
 		KeyInput(mon);
 
-		if (Time <= 0) { start_flag = 1; Time = 600; }
+		if (Time <= 0) { start_flag = 1; Time = 150; }
 
 		if (start_flag == 1)
 		{
@@ -197,8 +197,8 @@ void ExitGame() {
 	printf("소프트웨어 기초설계 2반 6조\n");
 	printf("박상우\n이다훈\n이종원\n박철우\n");
 	printf("===================================\n");
-	printf("contact us : psw7205@gmail.com\n");
 	printf("https://github.com/psw7205/SWDesign\n");
+	getchar();
 }
 
 void DrawGameBoard() {
@@ -552,6 +552,11 @@ void InitMonster(NPC *mon, int i)
 			mon[i].hp = 300;
 			mon[i].max_hp = 300;
 		}
+	}
+	else
+	{
+		ExitGame();
+		exit(0);
 	}
 }
 
