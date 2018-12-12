@@ -33,7 +33,7 @@
 #define ESC 27
 
 #define SPEED 10
-#define TIME 200
+#define TIME 150
 
 COORD MyGetCursor();
 void MySetCursor(int x, int y);
@@ -66,7 +66,7 @@ void DeleteTower();
 void bomb(NPC *mon);
 void DeleteMonster(char monsterInfo[2][2], int mx, int my);
 void printfhelp();
-void printWin();
+void GameWin();
 COORD start, end, first_corner;
 
 int gold;
@@ -157,13 +157,15 @@ void StartGame() {
 	mon = MakeMonster();
 	Stage = 1;
 	life = 10;
-	gold = 500;
+	gold = 4000;
 	Time = TIME;
 	DrawGameBoard();//draw the road of game screen
 	MySetCursor(60, 35);
 	PrintLife();
 	MySetCursor(0, 32);
 	PrintHelpMenu();
+
+	PlaySound(TEXT("stage.wav"), NULL, SND_ASYNC | SND_LOOP);
 
 	while (1)
 	{
@@ -175,7 +177,11 @@ void StartGame() {
 
 		KeyInput(mon);
 
-		if (Time <= 0) { start_flag = 1; Time = TIME; }
+		if (Time <= 0)
+		{
+			start_flag = 1;
+			Time = TIME;
+		}
 
 		if (start_flag == 1)
 		{
@@ -188,7 +194,6 @@ void StartGame() {
 			printf("Time Limit:%3ds", Time / 10);
 			Time--;
 			MySetCursor(curPosX, curPosY);
-			// Time
 		}
 	}
 
@@ -210,7 +215,7 @@ void ExitGame() {
 	printf("contact us : psw7205@gmail.com\n");
 	printf("https://github.com/psw7205/SWDesign\n");
 
-	Sleep(3 * 1000);
+	Sleep(4 * 1000);
 	exit(0);
 }
 
@@ -566,10 +571,6 @@ void InitMonster(NPC *mon, int i)
 			mon[i].max_hp = 300;
 		}
 	}
-	else
-	{
-		printWin();
-	}
 
 }
 
@@ -644,7 +645,6 @@ void DC_chk(NPC *mon)
 				}
 			}
 
-			PlaySound(TEXT("attack.wav"), NULL, SND_ASYNC);
 			//printf("%d", mon->hp);
 		}
 	}
@@ -653,6 +653,7 @@ void DC_chk(NPC *mon)
 int MoveMonster(NPC *mon) {
 	int i = 0;
 	int bullet = 0;
+
 	for (i = 0; i < 10; i++)
 	{
 		if (mon[i].move_flag == 1)
@@ -751,11 +752,16 @@ int MoveMonster(NPC *mon) {
 			InitMonster(mon, i);
 			mon[i].move_flag = 1;
 		}
+
 		Stage++;
+		if (Stage == 6 && life >= 0)
+			GameWin();
+
 		MySetCursor(0, 32);
 		PrintHelpMenu();
 		return 0;
 	}
+
 	return 1;
 }
 ///// 몬스터 부분.
@@ -891,6 +897,7 @@ void PrintHelpMenu()
 void GameOver()
 {
 	system("cls");
+	PlaySound(TEXT("gameOver.wav"), NULL, SND_ASYNC | SND_LOOP);
 	MySetCursor(16, 5);
 	for (int i = 0; i < 11; i++) {
 		for (int j = 0; j < 28; j++) {
@@ -903,20 +910,17 @@ void GameOver()
 		}
 		printf("\n");
 	}
-	MySetCursor(26, 20);
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
-	printf("다시 시작하려면 아무키나 누르시오.");
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+	printf("\n\n");
+	printf("\t\t 소프트웨어 기초설계 2반 6조\n");
+	printf("\t\t 박상우 이다훈 이종원 박철우\n");
+	printf("\t\t ===================================\n");
+	printf("\t\t contact us : psw7205@gmail.com\n");
+	printf("\t\t https://github.com/psw7205/SWDesign\n");
+	printf("\n");
 
-	char ch;
-	while (1)
-	{
-		ch = _kbhit();
-		if (ch != 0)
-		{
-			RunGame();
-		}
-	}
+	Sleep(7*1000);
+	exit(0);
 }
 
 void HelpGame()
@@ -1008,9 +1012,11 @@ void printfhelp() {
 	printf("└──────────────────────────────────────────────────────┘\n");
 }
 
-void printWin()
+void GameWin()
 {
 	system("cls");
+	PlaySound(TEXT("gameEnd.wav"), NULL, SND_ASYNC | SND_LOOP);
+
 	MySetCursor(16, 5);
 	for (int i = 0; i < 7; i++) {
 		for (int j = 0; j < 19; j++) {
@@ -1026,13 +1032,13 @@ void printWin()
 
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 	printf("\n");
-	printf("           소프트웨어 기초설계 2반 6조\n");
-	printf("           박상우 이다훈 이종원 박철우\n");
-	printf("           ===================================\n");
-	printf("           contact us : psw7205@gmail.com\n");
-	printf("           https://github.com/psw7205/SWDesign\n");
+	printf("\t\t 소프트웨어 기초설계 2반 6조\n");
+	printf("\t\t 박상우 이다훈 이종원 박철우\n");
+	printf("\t\t ===================================\n");
+	printf("\t\t contact us : psw7205@gmail.com\n");
+	printf("\t\t https://github.com/psw7205/SWDesign\n");
+	printf("\n");
 
-	PlaySound(TEXT("gameEnd.wav"),NULL,SND_ASYNC|SND_LOOP);
 	Sleep(11 * 1000);
-	exit(0);
+	exit(0); // 다시게임하기 구현 실패, 맵 배열들 초기화 필요
 }
