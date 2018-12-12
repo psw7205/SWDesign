@@ -18,10 +18,13 @@
 #include <windows.h>
 #include <conio.h>
 #include <time.h>
+#include <mmsystem.h>
+
 #include "ItemDesign.h"
 #include "Monsters.h"
 #include "Tower.h"
 
+#pragma comment(lib,"winmm.lib")
 #pragma warning (disable:4996)
 #define LEFT 75
 #define RIGHT 77
@@ -63,13 +66,13 @@ void DeleteTower();
 void bomb(NPC *mon);
 void DeleteMonster(char monsterInfo[2][2], int mx, int my);
 void printfhelp();
-
+void printWin();
 COORD start, end, first_corner;
 
-int gold = 5000;
-int life = 10;
-int Time = TIME;
-int Stage = 0;
+int gold;
+int life;
+int Time;
+int Stage;
 
 int main() {
 	RunGame();
@@ -126,6 +129,7 @@ void StartMenu()
 
 void RunGame() {
 	system("mode con cols=86 lines=42");
+	PlaySound(TEXT("gameStart.wav"), NULL, SND_ASYNC);
 	while (1) {
 		StartMenu();
 		char selectMenu = getch();
@@ -153,7 +157,7 @@ void StartGame() {
 	mon = MakeMonster();
 	Stage = 1;
 	life = 10;
-	gold = 5000;
+	gold = 500;
 	Time = TIME;
 	DrawGameBoard();//draw the road of game screen
 	MySetCursor(60, 35);
@@ -562,13 +566,19 @@ void InitMonster(NPC *mon, int i)
 			mon[i].max_hp = 300;
 		}
 	}
+	else
+	{
+		printWin();
+	}
+
 }
 
 void DC_chk(NPC *mon)
 {
 	int bullet;
-	int type; // 
+	int type;
 	int i;
+
 	for (i = 0; i < 2; i++) // 길 양쪽 체크
 	{
 		if (mon->move_flag % 2 == 0) // 세로 길
@@ -634,6 +644,7 @@ void DC_chk(NPC *mon)
 				}
 			}
 
+			PlaySound(TEXT("attack.wav"), NULL, SND_ASYNC);
 			//printf("%d", mon->hp);
 		}
 	}
@@ -927,6 +938,7 @@ void HelpGame()
 		}
 	}
 }
+
 void PrintLife()
 {
 	int i;
@@ -994,4 +1006,33 @@ void printfhelp() {
 	printf("│                                                      │\n");
 	MySetCursor(15, 25);
 	printf("└──────────────────────────────────────────────────────┘\n");
+}
+
+void printWin()
+{
+	system("cls");
+	MySetCursor(16, 5);
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 19; j++) {
+			MySetCursor(16 + j * 2, 5 + i);
+			if (winMessage[i][j] == 1)
+			{
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
+				printf("■");
+			}
+		}
+		printf("\n");
+	}
+
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+	printf("\n");
+	printf("           소프트웨어 기초설계 2반 6조\n");
+	printf("           박상우 이다훈 이종원 박철우\n");
+	printf("           ===================================\n");
+	printf("           contact us : psw7205@gmail.com\n");
+	printf("           https://github.com/psw7205/SWDesign\n");
+
+	PlaySound(TEXT("gameEnd.wav"),NULL,SND_ASYNC|SND_LOOP);
+	Sleep(11 * 1000);
+	exit(0);
 }
