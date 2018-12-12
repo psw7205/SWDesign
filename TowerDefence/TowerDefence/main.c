@@ -29,7 +29,7 @@
 #define DOWN 80
 #define ESC 27
 
-#define SPEED 1
+#define SPEED 10
 #define TIME 200
 
 COORD MyGetCursor();
