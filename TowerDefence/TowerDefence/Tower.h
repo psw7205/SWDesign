@@ -182,6 +182,4 @@ void DeleteBullet(int tx, int ty)
 	TowerModel[ty][tx + 1] -= type;
 	TowerModel[ty + 1][tx] -= type;
 	TowerModel[ty + 1][tx + 1] -= type;
-
-
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdlib.h>
 typedef struct NPC {
 	int hp;
 	int max_hp;
