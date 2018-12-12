@@ -1,5 +1,4 @@
 ﻿/*
-
 몬스터 : 불, 물, 나무, 보스(노멀)
 타워 : 불, 물, 나무, 노멀
 
@@ -13,7 +12,6 @@
 스테이지4: 불4물4나무2 (체력200)
 스테이지5: 불3물3나무3보스1 (체력200)(보스체력300(모든공격50%))
 각각 상성나쁨(150%), 상성좋음(50%), 보통(100%)
-
 */
 
 #include <stdio.h>
@@ -32,7 +30,7 @@
 #define ESC 27
 
 #define SPEED 1
-#define TIME 300
+#define TIME 200
 
 COORD MyGetCursor();
 void MySetCursor(int x, int y);
@@ -68,14 +66,13 @@ void printfhelp();
 
 COORD start, end, first_corner;
 
-int gold = 500;
+int gold = 5000;
 int life = 10;
 int Time = TIME;
 int Stage = 0;
 
 int main() {
 	RunGame();
-	getchar();
 	return 0;
 }
 
@@ -125,10 +122,10 @@ void StartMenu()
 
 	MySetCursor(36, 24);
 	printf("3 : EXIT");
-
 }
+
 void RunGame() {
-	system("mode con cols=86 lines=44");
+	system("mode con cols=86 lines=42");
 	while (1) {
 		StartMenu();
 		char selectMenu = getch();
@@ -156,7 +153,7 @@ void StartGame() {
 	mon = MakeMonster();
 	Stage = 1;
 	life = 10;
-	gold = 500;
+	gold = 5000;
 	Time = TIME;
 	DrawGameBoard();//draw the road of game screen
 	MySetCursor(60, 35);
@@ -208,6 +205,9 @@ void ExitGame() {
 	printf("===================================\n");
 	printf("contact us : psw7205@gmail.com\n");
 	printf("https://github.com/psw7205/SWDesign\n");
+
+	Sleep(3 * 1000);
+	exit(0);
 }
 
 void DrawGameBoard() {
@@ -634,7 +634,7 @@ void DC_chk(NPC *mon)
 				}
 			}
 
-			printf("%d", mon->hp);////////////////////////////////////////////////지우기★
+			//printf("%d", mon->hp);
 		}
 	}
 }
@@ -896,9 +896,12 @@ void GameOver()
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 	printf("다시 시작하려면 아무키나 누르시오.");
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+	char ch;
 	while (1)
 	{
-		if (_kbhit() != 0)
+		ch = _kbhit();
+		if (ch != 0)
 		{
 			RunGame();
 		}
