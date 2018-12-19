@@ -121,9 +121,8 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ItemDesign.h" />
-    <ClInclude Include="Monsters.h" />
-    <ClInclude Include="Tower.h" />
+    <ClInclude Include="func.h" />
+    <ClInclude Include="struct.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

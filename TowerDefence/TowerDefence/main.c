@@ -20,79 +20,32 @@
 #include <time.h>
 #include <mmsystem.h>
 
-#include "ItemDesign.h"
-#include "Monsters.h"
-#include "Tower.h"
+#include "struct.h"
+#include "func.h"
 
-#pragma comment(lib,"winmm.lib")
-#pragma warning (disable:4996)
-#define LEFT 75
-#define RIGHT 77
-#define UP 72
-#define DOWN 80
-#define ESC 27
-
-#define SPEED 10
-#define TIME 150
-
-COORD MyGetCursor();
-void MySetCursor(int x, int y);
-void RemoveCursor();
-void StartMenu();
-void HelpGame();
-void RunGame();
-void StartGame();
-void ExitGame();
-void DrawGameBoard();
-void ShiftRight();
-void ShiftLeft();
-void ShiftDown();
-void ShiftUp();
-void PrintCurPos();
-void KeyInput(NPC *mon);
-void PrintHelpMenu();
-void PrintLife();
-void SelectTower(int type);
-int isGameOver();
-void GameOver();
-void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, int my);
-int curPosX, curPosY;
-int start_flag = 0;
-int DetectCollision(int posX, int posY);
-int MoveMonster(NPC *mon);
-void DC_chk(NPC *mon);
-void InitMonster(NPC *mon, int i);
-void DeleteTower();
-void bomb(NPC *mon);
-void DeleteMonster(char monsterInfo[2][2], int mx, int my);
-void printfhelp();
-void GameWin();
-void gamePause();
-COORD start, end, first_corner;
-
-int gold;
-int life;
-int Time;
-int Stage;
-
-int main() {
+int main()
+{
 	RunGame();
 	return 0;
 }
 
-void RemoveCursor() {
+void RemoveCursor()
+{
 	CONSOLE_CURSOR_INFO curInfo;
 	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
 	curInfo.bVisible = 0;
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
 }
 
-void MySetCursor(int x, int y) {
-	COORD pos = { (SHORT)x, (SHORT)y };
+void MySetCursor(int x, int y)
+{
+	COORD pos =
+	{ (SHORT)x, (SHORT)y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
-COORD MyGetCursor() {
+COORD MyGetCursor()
+{
 	COORD curPoint;
 	CONSOLE_SCREEN_BUFFER_INFO curInfo;
 
@@ -102,12 +55,15 @@ COORD MyGetCursor() {
 
 	return curPoint;
 }
+
 void StartMenu()
 {
 	system("cls");
 	MySetCursor(16, 5);
-	for (int i = 0; i < 11; i++) {
-		for (int j = 0; j < 28; j++) {
+	for (int i = 0; i < 11; i++)
+	{
+		for (int j = 0; j < 28; j++)
+		{
 			MySetCursor(16 + j * 2, 5 + i);
 			if (title[i][j] == 1)
 			{
@@ -128,31 +84,38 @@ void StartMenu()
 	printf("3 : EXIT");
 }
 
-void RunGame() {
+void RunGame()
+{
 	system("mode con cols=86 lines=42");
 	PlaySound(TEXT("gameStart.wav"), NULL, SND_ASYNC);
-	while (1) {
+	while (1)
+	{
 		StartMenu();
 		char selectMenu = getch();
 		//show menu and receive key input
-		if (selectMenu == '1') {
+		if (selectMenu == '1')
+		{
 			StartGame();
 			break;
 		}
-		else if (selectMenu == '2') {
+		else if (selectMenu == '2')
+		{
 			HelpGame();
 		}
-		else if (selectMenu == '3') {
+		else if (selectMenu == '3')
+		{
 			ExitGame();
 			break;
 		}
-		else {
+		else
+		{
 			continue;
 		}
 	}
 }
 
-void StartGame() {
+void StartGame()
+{
 	system("cls");
 	NPC *mon;
 	mon = MakeMonster();
@@ -208,7 +171,8 @@ int isGameOver()
 	return 0;
 }
 
-void ExitGame() {
+void ExitGame()
+{
 	system("cls");
 	printf("소프트웨어 기초설계 2반 6조\n");
 	printf("박상우\n이다훈\n이종원\n박철우\n");
@@ -220,9 +184,12 @@ void ExitGame() {
 	exit(0);
 }
 
-void DrawGameBoard() {
-	for (int i = 0; i < 33; i++) {
-		for (int j = 0; j < 43; j++) {
+void DrawGameBoard()
+{
+	for (int i = 0; i < 33; i++)
+	{
+		for (int j = 0; j < 43; j++)
+		{
 			MySetCursor(j * 2, i);
 			if (mapModel[i][j] == 1)
 				printf("■");
@@ -231,7 +198,8 @@ void DrawGameBoard() {
 	}
 } //draw the road of game screen
 
-void ShiftRight() {
+void ShiftRight()
+{
 	curPosX += 2;
 	if (curPosX > 82)
 	{
@@ -241,13 +209,15 @@ void ShiftRight() {
 	return;
 }
 
-void ShiftLeft() {
+void ShiftLeft()
+{
 	if (!(curPosX - 2 < 0))curPosX -= 2;
 	MySetCursor(curPosX, curPosY);
 	return;
 }
 
-void ShiftDown() {
+void ShiftDown()
+{
 	curPosY++;
 	if (curPosY > 30)
 	{
@@ -257,7 +227,8 @@ void ShiftDown() {
 	return;
 }
 
-void ShiftUp() {
+void ShiftUp()
+{
 	curPosY--;
 	if (curPosY < 0)
 	{
@@ -266,12 +237,16 @@ void ShiftUp() {
 	MySetCursor(curPosX, curPosY);
 }
 
-void KeyInput(NPC *mon) {
+void KeyInput(NPC *mon)
+{
 	int key;
-	for (int i = 0; i < 10; i++) {
-		if (_kbhit() != 0) {
+	for (int i = 0; i < 10; i++)
+	{
+		if (_kbhit() != 0)
+		{
 			key = _getch();
-			switch (key) {
+			switch (key)
+			{
 			case LEFT:
 				if (start_flag == 0)
 				{
@@ -324,11 +299,11 @@ void KeyInput(NPC *mon) {
 			case 'a':
 				if (start_flag == 1)
 				{
-					bomb(mon);
+					Bomb(mon);
 				}
 				break;
 			case ESC:
-				gamePause();
+				GamePause();
 				break;
 			}
 		}
@@ -337,23 +312,27 @@ void KeyInput(NPC *mon) {
 	PrintCurPos();
 }
 
-void gamePause()
+void GamePause()
 {
 	system("pause>null");
 }
 
 
 ///// 몬스터 부분.
-void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, int my) { // 1로 되어있는 곳을 보여준다.
+void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, int my)
+{ // 1로 되어있는 곳을 보여준다.
 	int x, y;
 
-	for (y = 0; y < 2; y++) {
-		for (x = 0; x < 2; x++) {
+	for (y = 0; y < 2; y++)
+	{
+		for (x = 0; x < 2; x++)
+		{
 			MySetCursor(mx + (x * 2), my + y);
 			switch (shape)
 			{
 			case 2:
-				if (monsterInfo[y][x] == 1) {
+				if (monsterInfo[y][x] == 1)
+				{
 					if ((hp <= ((max_hp / 10.0) * 6)) && (hp > ((max_hp / 10.0) * 3)))
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
@@ -375,7 +354,8 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, 
 				}
 				break;
 			case 3:
-				if (monsterInfo[y][x] == 1) {
+				if (monsterInfo[y][x] == 1)
+				{
 					if ((hp <= ((max_hp / 10.0) * 6)) && (hp > ((max_hp / 10.0) * 3)))
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
@@ -397,7 +377,8 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, 
 				}
 				break;
 			case 4:
-				if (monsterInfo[y][x] == 1) {
+				if (monsterInfo[y][x] == 1)
+				{
 					if ((hp <= ((max_hp / 10.0) * 6)) && (hp > ((max_hp / 10.0) * 3)))
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
@@ -419,7 +400,8 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, 
 				}
 				break;
 			case 5:
-				if (monsterInfo[y][x] == 1) {
+				if (monsterInfo[y][x] == 1)
+				{
 					if ((hp <= ((max_hp / 10.0) * 6)) && (hp > ((max_hp / 10.0) * 3)))
 					{
 						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
@@ -446,14 +428,17 @@ void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, 
 	MySetCursor(mx, my);
 }
 
-void bomb(NPC*mon) {
+void Bomb(NPC*mon)
+{
 	int i;
 	int bombprice = 300;
 	if (gold < bombprice) return;
 	gold -= bombprice;
 
-	for (int i = 0; i < 33; i++) {
-		for (int j = 0; j < 43; j++) {
+	for (int i = 0; i < 33; i++)
+	{
+		for (int j = 0; j < 43; j++)
+		{
 			MySetCursor(j * 2, i);
 			if (mapModel[i][j] == 9)
 			{
@@ -465,8 +450,10 @@ void bomb(NPC*mon) {
 		printf("\n");
 	}
 	Sleep(100);
-	for (int i = 0; i < 33; i++) {
-		for (int j = 0; j < 43; j++) {
+	for (int i = 0; i < 33; i++)
+	{
+		for (int j = 0; j < 43; j++)
+		{
 			MySetCursor(j * 2, i);
 			if (mapModel[i][j] == 9)
 				printf(" ");
@@ -474,7 +461,8 @@ void bomb(NPC*mon) {
 		printf("\n");
 	}
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 10; i++)
+	{
 		if (mon[i].curx > 0) // 맵에 있는 몬스터만 폭탄
 		{
 			mon[i].hp -= 200; // 폭탄 데미지
@@ -490,14 +478,18 @@ void bomb(NPC*mon) {
 	PrintHelpMenu();
 }
 
-void DeleteMonster(char monsterInfo[2][2], int mx, int my) { // 1로 되어있는 곳을 지운다.
+void DeleteMonster(char monsterInfo[2][2], int mx, int my)
+{ // 1로 되어있는 곳을 지운다.
 	int x, y;
 
-	for (y = 0; y < 2; y++) {
-		for (x = 0; x < 2; x++) {
+	for (y = 0; y < 2; y++)
+	{
+		for (x = 0; x < 2; x++)
+		{
 			MySetCursor(mx + (x * 2), my + y);
 
-			if (monsterInfo[y][x] == 1) {
+			if (monsterInfo[y][x] == 1)
+			{
 				printf(" ");
 			}
 		}
@@ -612,7 +604,8 @@ void DC_chk(NPC *mon)
 				)
 			{
 				mon->hp -= ((bullet / 100) / 2);
-				if (mon->hp <= 0) {
+				if (mon->hp <= 0)
+				{
 					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
 					gold += 20;
 					mon->move_flag = 0;
@@ -630,7 +623,8 @@ void DC_chk(NPC *mon)
 			{
 				mon->hp -= ((bullet / 100) + ((bullet / 100) / 2));
 
-				if (mon->hp <= 0) {
+				if (mon->hp <= 0)
+				{
 					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
 					gold += 20;
 					mon->move_flag = 0;
@@ -646,7 +640,8 @@ void DC_chk(NPC *mon)
 				)
 			{
 				mon->hp -= (bullet / 100);
-				if (mon->hp <= 0) {
+				if (mon->hp <= 0)
+				{
 					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
 					gold += 20;
 					mon->move_flag = 0;
@@ -661,7 +656,8 @@ void DC_chk(NPC *mon)
 	}
 }
 
-int MoveMonster(NPC *mon) {
+int MoveMonster(NPC *mon)
+{
 	int i = 0;
 	int bullet = 0;
 
@@ -680,7 +676,10 @@ int MoveMonster(NPC *mon) {
 				ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 				DC_chk(&mon[i]);
 			}
-			if (mon[i].curx == 76) { mon[i].move_flag = 2; }
+			if (mon[i].curx == 76)
+			{
+				mon[i].move_flag = 2;
+			}
 		}
 		if (mon[i].move_flag == 2)
 		{
@@ -689,7 +688,10 @@ int MoveMonster(NPC *mon) {
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].cury == 19) { mon[i].move_flag = 3; }
+			if (mon[i].cury == 19)
+			{
+				mon[i].move_flag = 3;
+			}
 		}
 		if (mon[i].move_flag == 3)
 		{
@@ -698,7 +700,10 @@ int MoveMonster(NPC *mon) {
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].curx == 8) { mon[i].move_flag = 4; }
+			if (mon[i].curx == 8)
+			{
+				mon[i].move_flag = 4;
+			}
 		}
 		if (mon[i].move_flag == 4)
 		{
@@ -707,7 +712,10 @@ int MoveMonster(NPC *mon) {
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].cury == 11) { mon[i].move_flag = 5; }
+			if (mon[i].cury == 11)
+			{
+				mon[i].move_flag = 5;
+			}
 		}
 		if (mon[i].move_flag == 5)
 		{
@@ -716,7 +724,10 @@ int MoveMonster(NPC *mon) {
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].curx == 42) { mon[i].move_flag = 6; }
+			if (mon[i].curx == 42)
+			{
+				mon[i].move_flag = 6;
+			}
 		}
 		if (mon[i].move_flag == 6)
 		{
@@ -725,7 +736,10 @@ int MoveMonster(NPC *mon) {
 			MySetCursor(mon[i].curx, mon[i].cury);
 			ShowMonster(monsterModel[0], mon[i].shape, mon[i].hp, mon[i].max_hp, mon[i].curx, mon[i].cury);
 			DC_chk(&mon[i]);
-			if (mon[i].cury == 27) { mon[i].move_flag = 7; }
+			if (mon[i].cury == 27)
+			{
+				mon[i].move_flag = 7;
+			}
 		}
 		if (mon[i].move_flag == 7)
 		{
@@ -777,25 +791,29 @@ int MoveMonster(NPC *mon) {
 }
 ///// 몬스터 부분.
 
-void PrintCurPos() {
+void PrintCurPos()
+{
 	MySetCursor(78, 37);
 	printf("(%2d, %2d)", curPosX, curPosY);
 	MySetCursor(curPosX, curPosY);
 }
 
-int DetectCollision(int posX, int posY) { // 충돌체크.
+int DetectCollision(int posX, int posY)
+{ // 충돌체크.
 	int dX, dY;
 	int tmp;
 	dX = posX / 2;
 	dY = posY;
 	tmp = TowerModel[dY][dX];
-	if (tmp != 1) {
+	if (tmp != 1)
+	{
 		return tmp;
 	}
 	return 0;
 }
 
-void SelectTower(int type) {
+void SelectTower(int type)
+{
 
 	if (TowerModel[curPosY + 1][curPosX / 2] % 10 != 1
 		&& TowerModel[curPosY][curPosX / 2] % 10 != 1
@@ -910,8 +928,10 @@ void GameOver()
 	system("cls");
 	PlaySound(TEXT("gameOver.wav"), NULL, SND_ASYNC | SND_LOOP);
 	MySetCursor(16, 5);
-	for (int i = 0; i < 11; i++) {
-		for (int j = 0; j < 28; j++) {
+	for (int i = 0; i < 11; i++)
+	{
+		for (int j = 0; j < 28; j++)
+		{
 			MySetCursor(16 + j * 2, 5 + i);
 			if (ending[i][j] == 1)
 			{
@@ -939,7 +959,7 @@ void HelpGame()
 	system("cls");
 	int key;
 
-	printfhelp();
+	PrintHelp();
 	while (1)
 	{
 		if (_kbhit() != 0)
@@ -977,7 +997,8 @@ void PrintLife()
 		}
 	}
 }
-void printfhelp() {
+void PrintHelp()
+{
 
 	MySetCursor(15, 5);
 	printf("┌──────────────────────────────────────────────────────┐\n");
@@ -1029,8 +1050,10 @@ void GameWin()
 	PlaySound(TEXT("gameEnd.wav"), NULL, SND_ASYNC | SND_LOOP);
 
 	MySetCursor(16, 5);
-	for (int i = 0; i < 7; i++) {
-		for (int j = 0; j < 19; j++) {
+	for (int i = 0; i < 7; i++)
+	{
+		for (int j = 0; j < 19; j++)
+		{
 			MySetCursor(16 + j * 2, 5 + i);
 			if (winMessage[i][j] == 1)
 			{
@@ -1052,4 +1075,190 @@ void GameWin()
 
 	Sleep(11 * 1000);
 	exit(0); // 다시게임하기 구현 실패, 맵 배열들 초기화 필요
+}
+
+NPC* MakeMonster()
+{
+	NPC *mon;
+	int i;
+	int num = 0;
+	int size = 10; //
+	mon = (NPC*)malloc(size * sizeof(NPC));
+	for (i = 0; i < size; i++)
+	{
+		mon[i].curx = num;
+		mon[i].cury = 3;
+		mon[i].hp = 100;
+		mon[i].max_hp = 100;
+		if (i < 5)
+		{
+			mon[i].shape = 2;
+		}
+		else
+		{
+			mon[i].shape = 3;
+		}
+		mon[i].move_flag = 1;
+		num = num - 16;
+	}
+	return mon;
+}
+
+void BuildTower(int type, int tx, int ty)
+{
+	char ch;
+	int bullet;
+	tx = tx / 2;
+	ch = type - ('a' - 'A');
+	if (ch == 'Q')
+	{
+		bullet = 1020;
+	}
+	else if (ch == 'W')
+	{
+		bullet = 1030;
+	}
+	else if (ch == 'E')
+	{
+		bullet = 1040;
+	}
+	else if (ch == 'R')
+	{
+		bullet = 1050;
+	}
+
+	if (TowerModel[ty][tx] != 2 && TowerModel[ty][tx] != 3)
+	{
+		// 타워 부분
+		if (ch == 'Q')
+		{
+			TowerModel[ty][tx] += 2;
+			TowerModel[ty][tx + 1] += 2;
+			TowerModel[ty + 1][tx] += 2;
+			TowerModel[ty + 1][tx + 1] += 2;
+		}
+		else if (ch == 'W')
+		{
+			TowerModel[ty][tx] += 3;
+			TowerModel[ty][tx + 1] += 3;
+			TowerModel[ty + 1][tx] += 3;
+			TowerModel[ty + 1][tx + 1] += 3;
+		}
+		else if (ch == 'E')
+		{
+			TowerModel[ty][tx] += 4;
+			TowerModel[ty][tx + 1] += 4;
+			TowerModel[ty + 1][tx] += 4;
+			TowerModel[ty + 1][tx + 1] += 4;
+		}
+		else if (ch == 'R')
+		{
+			TowerModel[ty][tx] += 5;
+			TowerModel[ty][tx + 1] += 5;
+			TowerModel[ty + 1][tx] += 5;
+			TowerModel[ty + 1][tx + 1] += 5;
+		}
+
+		// 총알부분(동)
+		TowerModel[ty][tx + 2] += bullet;
+		TowerModel[ty][tx + 3] += bullet;
+		TowerModel[ty + 1][tx + 2] += bullet;
+		TowerModel[ty + 1][tx + 3] += bullet;
+
+		// 총알부분(서)
+		if (tx - 1 >= 0)
+		{
+			TowerModel[ty][tx - 1] = TowerModel[ty][tx - 1] + bullet;
+			TowerModel[ty + 1][tx - 1] = TowerModel[ty + 1][tx - 1] + bullet;
+		}
+		if (tx - 2 >= 0)
+		{
+			TowerModel[ty][tx - 2] = TowerModel[ty][tx - 2] + bullet;
+			TowerModel[ty + 1][tx - 2] = TowerModel[ty + 1][tx - 2] + bullet;
+		}
+
+		// 총알부분(남)
+		TowerModel[ty + 2][tx] = TowerModel[ty + 2][tx] + bullet;
+		TowerModel[ty + 2][tx + 1] = TowerModel[ty + 2][tx + 1] + bullet;
+		TowerModel[ty + 3][tx] = TowerModel[ty + 3][tx] + bullet;
+		TowerModel[ty + 3][tx + 1] = TowerModel[ty + 3][tx + 1] + bullet;
+
+		// 총알부분(북)
+		if (ty - 1 >= 0)
+		{
+			TowerModel[ty - 1][tx] = TowerModel[ty - 1][tx] + bullet;
+			TowerModel[ty - 1][tx + 1] = TowerModel[ty - 1][tx + 1] + bullet;
+		}
+		if (ty - 2 >= 0)
+		{
+			TowerModel[ty - 2][tx] = TowerModel[ty - 2][tx] + bullet;
+			TowerModel[ty - 2][tx + 1] = TowerModel[ty - 2][tx + 1] + bullet;
+		}
+	}
+}
+
+void DeleteBullet(int tx, int ty)
+{
+	int bullet;
+	int type;
+	tx = tx / 2;
+	type = TowerModel[ty][tx] % 10;
+	if (type == 2)
+	{
+		bullet = 1020;
+	}
+	else if (type == 3)
+	{
+		bullet = 1030;
+	}
+	else if (type == 4)
+	{
+		bullet = 1040;
+	}
+	else if (type == 5)
+	{
+		bullet = 1050;
+	}
+
+	// 총알부분(동)
+	TowerModel[ty][tx + 2] = TowerModel[ty][tx + 2] - bullet;
+	TowerModel[ty][tx + 3] = TowerModel[ty][tx + 3] - bullet;
+	TowerModel[ty + 1][tx + 2] = TowerModel[ty + 1][tx + 2] - bullet;
+	TowerModel[ty + 1][tx + 3] = TowerModel[ty + 1][tx + 3] - bullet;
+
+	// 총알부분(서)
+	if (tx - 1 >= 0)
+	{
+		TowerModel[ty][tx - 1] = TowerModel[ty][tx - 1] - bullet;
+		TowerModel[ty + 1][tx - 1] = TowerModel[ty + 1][tx - 1] - bullet;
+	}
+	if (tx - 2 >= 0)
+	{
+		TowerModel[ty][tx - 2] = TowerModel[ty][tx - 2] - bullet;
+		TowerModel[ty + 1][tx - 2] = TowerModel[ty + 1][tx - 2] - bullet;
+	}
+
+	// 총알부분(남)
+	TowerModel[ty + 2][tx] = TowerModel[ty + 2][tx] - bullet;
+	TowerModel[ty + 2][tx + 1] = TowerModel[ty + 2][tx + 1] - bullet;
+	TowerModel[ty + 3][tx] = TowerModel[ty + 3][tx] - bullet;
+	TowerModel[ty + 3][tx + 1] = TowerModel[ty + 3][tx + 1] - bullet;
+
+	// 총알부분(북)
+	if (ty - 1 >= 0)
+	{
+		TowerModel[ty - 1][tx] = TowerModel[ty - 1][tx] - bullet;
+		TowerModel[ty - 1][tx + 1] = TowerModel[ty - 1][tx + 1] - bullet;
+	}
+	if (ty - 2 >= 0)
+	{
+		TowerModel[ty - 2][tx] = TowerModel[ty - 2][tx] - bullet;
+		TowerModel[ty - 2][tx + 1] = TowerModel[ty - 2][tx + 1] - bullet;
+	}
+
+	// 타워 부분
+	TowerModel[ty][tx] -= type;
+	TowerModel[ty][tx + 1] -= type;
+	TowerModel[ty + 1][tx] -= type;
+	TowerModel[ty + 1][tx + 1] -= type;
 }
