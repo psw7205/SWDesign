@@ -67,6 +67,7 @@ void bomb(NPC *mon);
 void DeleteMonster(char monsterInfo[2][2], int mx, int my);
 void printfhelp();
 void GameWin();
+void gamePause();
 COORD start, end, first_corner;
 
 int gold;
@@ -157,7 +158,7 @@ void StartGame() {
 	mon = MakeMonster();
 	Stage = 1;
 	life = 10;
-	gold = 4000;
+	gold = 500;
 	Time = TIME;
 	DrawGameBoard();//draw the road of game screen
 	MySetCursor(60, 35);
@@ -224,7 +225,7 @@ void DrawGameBoard() {
 		for (int j = 0; j < 43; j++) {
 			MySetCursor(j * 2, i);
 			if (mapModel[i][j] == 1)
-				printf("#");
+				printf("■");
 		}
 		printf("\n");
 	}
@@ -326,12 +327,21 @@ void KeyInput(NPC *mon) {
 					bomb(mon);
 				}
 				break;
+			case ESC:
+				gamePause();
+				break;
 			}
 		}
 		Sleep(SPEED);
 	}
 	PrintCurPos();
 }
+
+void gamePause()
+{
+	system("pause>null");
+}
+
 
 ///// 몬스터 부분.
 void ShowMonster(char monsterInfo[2][2], int shape, int hp, int max_hp, int mx, int my) { // 1로 되어있는 곳을 보여준다.
@@ -594,14 +604,14 @@ void DC_chk(NPC *mon)
 		type %= 10; // bullet의 10의자리는 몬스터 종류(Shape)
 		if (bullet != 0)
 		{
-			if ( // 150%의 데미지
+			if ( // 50%의 데미지
 				(mon->shape == 2 && type == 4) ||
 				(mon->shape == 3 && type == 2) ||
 				(mon->shape == 4 && type == 3) ||
 				(type == 5)
 				)
 			{
-				mon->hp -= ((bullet / 100) + ((bullet / 100) / 2));
+				mon->hp -= ((bullet / 100) / 2);
 				if (mon->hp <= 0) {
 					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
 					gold += 20;
@@ -611,14 +621,15 @@ void DC_chk(NPC *mon)
 					PrintHelpMenu();
 				}
 			}
-			else if ( // 50%의 데미지
+			else if ( // 150%의 데미지
 				(mon->shape == 4 && type == 2) ||
 				(mon->shape == 2 && type == 3) ||
 				(mon->shape == 3 && type == 4) ||
 				(mon->shape == 5)
 				)
 			{
-				mon->hp -= ((bullet / 100) / 2);
+				mon->hp -= ((bullet / 100) + ((bullet / 100) / 2));
+
 				if (mon->hp <= 0) {
 					DeleteMonster(monsterModel[0], mon->curx, mon->cury);
 					gold += 20;
@@ -919,7 +930,7 @@ void GameOver()
 	printf("\t\t https://github.com/psw7205/SWDesign\n");
 	printf("\n");
 
-	Sleep(7*1000);
+	Sleep(7 * 1000);
 	exit(0);
 }
 
