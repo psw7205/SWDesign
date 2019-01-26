@@ -1,0 +1,1056 @@
+﻿실습 1
+#include <stdio.h>
+#include <windows.h>
+
+void MySetCursorPos(int x, int y)
+{
+	COORD position = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), position);
+}
+
+int main()
+{
+	for (int i = 0; i < 20; i++)
+	{
+
+		MySetCursorPos(abs(20 - 2 * i), i);
+		printf("■");
+
+	}
+
+	return 0;
+}
+========================================================================================
+실습 2
+#include <stdio.h>
+#include <windows.h>
+
+void MySetCursorPos(int x, int y)
+{
+	COORD position = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), position);
+}
+
+COORD MyGetCursorPos()
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+
+	return curPoint;
+}
+
+int main()
+{
+	COORD curPoint;
+	for (int i = 0; i < 20; i++)
+	{
+		MySetCursorPos(abs(20 - 2 * i), i);
+		curPoint = MyGetCursorPos();
+		printf("[%d][%d]", curPoint.X, curPoint.Y);
+	}
+
+	return 0;
+}
+========================================================================================
+실습 3
+#include <stdio.h>
+#include <windows.h>
+
+void MySetCursorPos(int x, int y);
+COORD MyGetCursorPos();
+
+int main()
+{
+	COORD curPoint;
+	for (int i = 0; i < 20; i++)
+	{
+		MySetCursorPos(abs(20 - 2 * i), i);
+		printf("[%d], [%d]", abs(20 - 2 * i), i);
+		curPoint = MyGetCursorPos(); // printf로 출력하면서 커서가 움직였기에 뒤 이어서 아래 문장이 출력됨
+		printf("[%d], [%d]", curPoint.X, curPoint.Y);
+	}
+
+	return 0;
+}
+
+
+void MySetCursorPos(int x, int y)
+{
+	COORD position = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), position);
+}
+
+COORD MyGetCursorPos()
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+
+	return curPoint;
+}
+
+========================================================================================
+실습 4 - 블록 지우기
+#include <stdio.h>
+#include <windows.h>
+
+char blockModel[][4][4] =
+{
+	{
+		{ 0, 0, 0, 0 },
+		{ 1, 0, 0, 0 },
+		{ 1, 1, 1, 0 },
+		{ 0, 0, 0, 0 }
+	},
+	{
+		{ 0, 0, 0, 0 },
+		{ 0, 0, 1, 0 },
+		{ 1, 1, 1, 0 },
+		{ 0, 0, 0, 0 }
+	},
+	{
+		{ 0, 0, 0, 0 },
+		{ 0, 1, 0, 0 },
+		{ 1, 1, 1, 0 },
+		{ 0, 0, 0, 0 }
+	},
+	{
+		{ 0, 1, 0, 0 },
+		{ 0, 1, 0, 0 },
+		{ 0, 1, 0, 0 },
+		{ 0, 1, 0, 0 }
+	},
+	{
+		{ 0, 0, 0, 0 },
+		{ 0, 1, 1, 0 },
+		{ 0, 1, 1, 0 },
+		{ 0, 0, 0, 0 }
+	},
+	{
+		{ 0, 0, 0, 0 },
+		{ 0, 1, 1, 0 },
+		{ 1, 1, 0, 0 },
+		{ 0, 0, 0, 0 }
+	},
+	{
+		{ 0, 0, 0, 0 },
+		{ 1, 1, 0, 0 },
+		{ 0, 1, 1, 0 },
+		{ 0, 0, 0, 0 }
+	}
+};
+
+void ShowBlock(char blockInfo[4][4]);
+void DeleteBlock(char blockInfo[4][4]);
+void MySetCursorPos(int x, int y);
+COORD MyGetCursorPos(void);
+
+int main()
+{
+
+	MySetCursorPos(0, 0);
+	ShowBlock(blockModel[0]);
+	Sleep(500); // milliseconds
+	DeleteBlock(blockModel[0]);
+
+	return 0;
+}
+
+void MySetCursorPos(int x, int y)
+{
+	COORD pos = { x, y };
+
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+
+	return;
+}
+
+COORD MyGetCursorPos(void)
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+
+	return curPoint;
+}
+
+void ShowBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf("■");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+void DeleteBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf(" "); // show에서 이 부분만 변경
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+========================================================================================
+실습 5 - ㅗ 블럭 회전
+#include <stdio.h>
+#include <windows.h>
+
+char blockModel[][4][4] =
+{
+
+	{
+		{0, 0, 0, 0},
+		{1, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{1, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 0, 1, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 1, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 1},
+		{0, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 1, 0, 0} },
+
+
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 1},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 1},
+		{0, 0, 0, 0} },
+
+
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{0, 0, 0, 0} }
+};
+
+void ShowBlock(char blockInfo[4][4]);
+void DeleteBlock(char blockInfo[4][4]);
+void MySetCursorPos(int x, int y);
+COORD MyGetCursorPos(void);
+
+int main()
+{
+	int i, j, k;
+
+	MySetCursorPos(0, 0);
+
+	for(i = 0 ; i < 10; i++)
+	{
+		for (j = 0; j <= 4; j++)
+		{
+			k = j % 4;
+			ShowBlock(blockModel[k + 8]);
+			Sleep(1000); // milliseconds
+			DeleteBlock(blockModel[k + 8]);
+		}
+
+		for (j = 3; j > 0; j--)
+		{
+			k = j % 4;
+			ShowBlock(blockModel[k + 8]);
+			Sleep(1000);
+			DeleteBlock(blockModel[k + 8]);
+		}
+	}
+
+	getchar();
+	return 0;
+}
+
+void MySetCursorPos(int x, int y)
+{
+	COORD pos = { x, y };
+
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+
+	return;
+}
+
+COORD MyGetCursorPos(void)
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+
+	return curPoint;
+}
+
+void ShowBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf("■");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+void DeleteBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf(" ");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+
+========================================================================================
+실습 6 - 블록 랜덤 생성 + 회전
+#include <stdio.h>
+#include <windows.h>
+#include <time.h>
+
+char blockModel[][4][4] =
+{
+
+	{
+		{0, 0, 0, 0},
+		{1, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{1, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 0, 1, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 1, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 1},
+		{0, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 1, 0, 0} },
+
+
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 1},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 1},
+		{0, 0, 0, 0} },
+
+
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{0, 0, 0, 0} }
+};
+
+void ShowBlock(char blockInfo[4][4]);
+void DeleteBlock(char blockInfo[4][4]);
+void MySetCursorPos(int x, int y);
+COORD MyGetCursorPos(void);
+
+int main()
+{
+	srand((unsigned int)time(NULL));
+	int blockID = rand() % 7 * 4;
+	int i, j, k;
+
+	MySetCursorPos(0, 0);
+
+	for (i = 0; i < 20; i++)
+	{
+		ShowBlock(blockModel[blockID + (i % 4)]);
+		Sleep(500); // milliseconds
+		DeleteBlock(blockModel[blockID + (i % 4)]);
+		MySetCursorPos(0, i);
+	}
+
+	getchar();
+	return 0;
+}
+
+void MySetCursorPos(int x, int y)
+{
+	COORD pos = { x, y };
+
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+
+	return;
+}
+
+COORD MyGetCursorPos(void)
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+
+	return curPoint;
+}
+
+void ShowBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf("■");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+void DeleteBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf(" ");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+========================================================================================
+실습 7 - 스크린 세이버
+#include <stdio.h>
+#include <windows.h>
+#include <time.h>
+
+char blockModel[][4][4] =
+{
+
+	{
+		{0, 0, 0, 0},
+		{1, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{1, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 0, 1, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 1, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 1},
+		{0, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 1, 0, 0} },
+
+
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 1},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{1, 1, 1, 1},
+		{0, 0, 0, 0} },
+
+
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{1, 1, 0, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0} },
+
+
+
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{0, 1, 1, 0},
+		{1, 1, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 0} },
+
+
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{0, 1, 1, 0},
+		{0, 0, 0, 0} },
+	{
+		{0, 1, 0, 0},
+		{1, 1, 0, 0},
+		{1, 0, 0, 0},
+		{0, 0, 0, 0} }
+};
+
+void ShowBlock(char blockInfo[4][4]);
+void DeleteBlock(char blockInfo[4][4]);
+void MySetCursorPos(int x, int y);
+COORD MyGetCursorPos(void);
+
+int main()
+{
+	srand((unsigned int)time(NULL));
+	int blockID ;
+	int i, j;
+	COORD point;
+	int vec;
+
+
+	for (i = 0; i < 10; i++)
+	{
+		blockID = rand() % 7 * 4;
+		vec = rand() % 8;
+		MySetCursorPos(rand() % 50, rand() % 50);
+
+		for (j = 0; j < 10; j++)
+		{
+			ShowBlock(blockModel[blockID + (j % 4)]);
+			Sleep(500); // milliseconds
+			DeleteBlock(blockModel[blockID + (j % 4)]);
+			point = MyGetCursorPos();
+
+			switch (vec)
+			{
+			case 1:
+				point.Y--;
+				break;
+			case 2:
+				point.X -= 2;
+				break;
+			case 3:
+				point.Y++;
+				break;
+			case 4:
+				point.X += 2;
+				break;
+			case 5:
+				point.X += 2;
+				point.Y--;
+				break;
+			case 6:
+				point.X += 2;
+				point.Y++;
+				break;
+			case 7:
+				point.X -= 2;
+				point.Y++;
+				break;
+			case 0:
+				point.X -= 2;
+				point.Y--;
+				break;
+			default:
+				break;
+
+			}
+			MySetCursorPos(point.X, point.Y);
+		}
+	}
+
+	getchar();
+	return 0;
+}
+
+void MySetCursorPos(int x, int y)
+{
+	COORD pos = { x, y };
+
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+
+	return;
+}
+
+COORD MyGetCursorPos(void)
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+
+	return curPoint;
+}
+
+void ShowBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf("■");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+void DeleteBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf(" ");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}

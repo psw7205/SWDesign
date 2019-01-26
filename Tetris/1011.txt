@@ -1,0 +1,244 @@
+﻿#include <stdio.h>
+#include <windows.h>
+#include <time.h>
+#include <conio.h>
+#include "block.h"
+#pragma warning(disable:4996)
+
+#define LEFT 75
+#define RIGHT 77
+#define UP 72
+#define SPACE 32
+#define SPEED 10
+
+/* Size of gameboard */
+#define GBOARD_WIDTH 10 // 커질수록 어려워짐
+#define GBOARD_HEIGHT 20 // 작아질수록 어려워짐
+/* Starting point of gameboard */
+#define GBOARD_ORIGIN_X 0 // 여백
+#define GBOARD_ORIGIN_Y 0
+
+int blockID;
+int curPosX;
+int curPosY;
+int gameBoardInfo[GBOARD_HEIGHT + 1][GBOARD_WIDTH + 2];
+
+void ShowBlock(char blockInfo[4][4]);
+void DeleteBlock(char blockInfo[4][4]);
+void MySetCursorPos(int x, int y);
+void RemoveCursor();
+void ShiftRight();
+void ShiftLeft();
+void RotateBlock();
+void RRotateBlock();
+void ShiftDown();
+void ShiftUp();
+COORD MyGetCursorPos(void);
+void KeyInput();
+void DrawGameBoard();
+int DetectCollision(int posX, int posY, char blockModel[4][4]);
+
+int main()
+{
+	srand((unsigned int)time(NULL));
+	blockID = rand() % 7 * 4;
+	MySetCursorPos(10, 0);
+	curPosX = MyGetCursorPos().X;
+	curPosY = MyGetCursorPos().Y;
+
+	RemoveCursor();
+
+	DrawGameBoard();
+
+	ShowBlock(blockModel[blockID]);
+
+	while (1)
+	{
+		ShiftDown();
+		KeyInput();
+	}
+
+	getchar();
+	return 0;
+}
+void MySetCursorPos(int x, int y)
+{
+	COORD pos = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+	return;
+}
+COORD MyGetCursorPos(void)
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+	return curPoint;
+}
+void ShowBlock(char blockInfo[4][4])
+{
+	int x, y;
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+			if (blockInfo[y][x] == 1)
+				printf("■");
+		}
+	}
+	MySetCursorPos(curPos.X, curPos.Y);
+	return;
+}
+void DeleteBlock(char blockInfo[4][4])
+{
+	int x, y;
+	COORD curPos = MyGetCursorPos();
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+			if (blockInfo[y][x] == 1)
+				printf(" ");
+		}
+	}
+	MySetCursorPos(curPos.X, curPos.Y);
+	return;
+}
+void RemoveCursor()
+{
+	CONSOLE_CURSOR_INFO curInfo;
+	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+	curInfo.bVisible = 0;
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+	return;
+}
+void ShiftRight()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosX += 2;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+	return;
+}
+void ShiftLeft()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosX -= 2;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+	return;
+}
+void ShiftDown()
+{
+	if (!DetectCollision(curPosX, curPosY + 1, blockModel[blockID]))
+		return;
+
+	DeleteBlock(blockModel[blockID]);
+	curPosY++;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+	return;
+}
+void RotateBlock()
+{
+	int base = blockID - blockID % 4;
+	DeleteBlock(blockModel[blockID]);
+	blockID = base + (blockID + 1) % 4;
+	ShowBlock(blockModel[blockID]);
+	return;
+}
+void RRotateBlock()
+{
+	int base = blockID - blockID % 4;
+	DeleteBlock(blockModel[blockID]);
+	if (blockID == base)
+		blockID += 3;
+	else
+		blockID--;
+	ShowBlock(blockModel[blockID]);
+	return;
+}
+void ShiftUp()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosY--;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+}
+void KeyInput()
+{
+	int key;
+	for (int i = 0; i < 20; i++)
+	{
+		if (_kbhit() != 0)
+		{
+			key = _getch();
+			switch (key)
+			{
+			case LEFT:
+				ShiftLeft();
+				break;
+			case RIGHT:
+				ShiftRight();
+				break;
+			case UP:
+				RotateBlock();
+				break;
+			}
+		}
+		Sleep(SPEED);
+	}
+}
+void DrawGameBoard()
+{
+	int x, y;
+	for (y = 0; y <= GBOARD_HEIGHT; y++)
+	{
+		MySetCursorPos(GBOARD_ORIGIN_X, GBOARD_ORIGIN_Y + y);
+		if (y == GBOARD_HEIGHT)
+			printf("└");
+		else
+			printf("│");
+	}
+	for (y = 0; y <= GBOARD_HEIGHT; y++)
+	{
+		MySetCursorPos(GBOARD_ORIGIN_X + GBOARD_WIDTH * 2, GBOARD_ORIGIN_Y + y);
+		if (y == GBOARD_HEIGHT)
+			printf("┘");
+		else
+			printf("│");
+	}
+	for (x = 1; x < GBOARD_WIDTH; x++)
+	{
+		MySetCursorPos(GBOARD_ORIGIN_X + x * 2, GBOARD_ORIGIN_Y + GBOARD_HEIGHT);
+		printf("─");
+	}
+
+	for (y = 0; y < GBOARD_HEIGHT; y++) {
+		gameBoardInfo[y][0] = 1;
+		gameBoardInfo[y][GBOARD_WIDTH + 1] = 1;
+	}
+	for (x = 0; x < GBOARD_WIDTH + 2; x++) {
+		gameBoardInfo[GBOARD_HEIGHT][x] = 1;
+	}
+}
+int DetectCollision(int posX, int posY, char blockModel[4][4])
+{
+	int x, y;
+	int arrX = posX / 2;
+	int arrY = posY;
+	for (x = 0; x < 4; x++)
+	{
+		for (y = 0; y < 4; y++)
+		{
+			if (blockModel[y][x] == 1 && gameBoardInfo[arrY + y][arrX + x] == 1)
+				return 0;
+		}
+	}
+	return 1;
+}

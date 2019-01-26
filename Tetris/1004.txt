@@ -1,0 +1,466 @@
+﻿회전 및 이동
+#include <stdio.h>
+#include <windows.h>
+#include <time.h>
+#include "block.h"
+
+int blockID;
+int curPosX;
+int curPosY;
+
+void ShowBlock(char blockInfo[4][4]);
+void DeleteBlock(char blockInfo[4][4]);
+void MySetCursorPos(int x, int y);
+void RemoveCursor();
+void ShiftRight();
+void ShiftLeft();
+void Rotate();
+void RRotate();
+void BlockDown();
+COORD MyGetCursorPos(void);
+
+int main()
+{
+	RemoveCursor();
+	srand((unsigned int)time(NULL));
+	blockID = rand() % 7 * 4;
+	int i;
+	COORD point = MyGetCursorPos();
+
+	curPosX = point.X;
+	curPosY = point.Y;
+
+	ShowBlock(blockModel[blockID]);
+
+	for (i = 0; i < 4; i++)
+	{
+		BlockDown();
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		ShiftRight();
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		RRotate();
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		BlockDown();
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		ShiftLeft();
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		BlockDown();
+	}
+
+	getchar();
+	return 0;
+}
+
+void MySetCursorPos(int x, int y)
+{
+	COORD pos = { x, y };
+
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+
+	return;
+}
+
+COORD MyGetCursorPos(void)
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+
+	return curPoint;
+}
+
+void ShowBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf("■");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+void DeleteBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf(" ");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+void RemoveCursor()
+
+{
+
+	CONSOLE_CURSOR_INFO curInfo;
+
+	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curInfo.bVisible = 0;
+
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	return;
+}
+
+void ShiftRight()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosX+= 2;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+	Sleep(300);
+
+	return;
+}
+
+void ShiftLeft()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosX -= 2;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+	Sleep(300);
+
+	return;
+}
+
+void BlockDown()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosY++;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+	Sleep(300);
+
+	return;
+
+}
+
+void Rotate()
+{
+	int base = blockID - blockID%4;
+	DeleteBlock(blockModel[blockID]);
+	blockID = base + (blockID + 1) % 4;
+	ShowBlock(blockModel[blockID]);
+	Sleep(300);
+	
+	return;
+}
+
+void RRotate()
+{
+	int base = blockID - blockID % 4;
+	DeleteBlock(blockModel[blockID]);
+
+	if (blockID == base)
+		blockID += 3;
+	else
+		blockID--;
+
+	ShowBlock(blockModel[blockID]);
+	Sleep(300);
+
+	return;
+}
+
+============================================================
+키입력
+#include <stdio.h>
+#include <windows.h>
+#include <conio.h>
+#pragma warning (disable:4996)
+
+int main()
+{
+	int key;
+
+	while (1)
+	{
+		while (!_kbhit())
+		{
+			printf("키를 입력\n");
+			Sleep(1000);
+		}
+
+		key = getch();
+		printf("%d\n", key);
+	}
+
+	return 0;
+}
+===========================================================
+#include <stdio.h>
+#include <windows.h>
+#include <time.h>
+#include <conio.h>
+#include "block.h"
+#pragma warning(disable:4996)
+
+int blockID;
+int curPosX;
+int curPosY;
+
+void ShowBlock(char blockInfo[4][4]);
+void DeleteBlock(char blockInfo[4][4]);
+void MySetCursorPos(int x, int y);
+void RemoveCursor();
+void ShiftRight();
+void ShiftLeft();
+void Rotate();
+void RRotate();
+void ShiftDown();
+void ShiftUp();
+COORD MyGetCursorPos(void);
+
+int main()
+{
+	RemoveCursor();
+	srand((unsigned int)time(NULL));
+	int key;
+	blockID = rand() % 7 * 4;
+	MySetCursorPos(20, 10);
+	curPosX = 20;
+	curPosY = 10;
+	ShowBlock(blockModel[blockID]);
+
+	while (1)
+	{
+		key = getch();
+		switch (key)
+		{
+		case 'a':
+			ShiftLeft();
+			break;
+		case 'd':
+			ShiftRight();
+			break;
+		case 'w':
+			ShiftUp();
+			break;
+		case 'x':
+			ShiftDown();
+			break;
+		case 'q':
+			ShiftLeft();
+			ShiftUp();
+			break;
+		case 'e':
+			ShiftRight();
+			ShiftUp();
+			break;
+		case 'c':
+			ShiftRight();
+			ShiftDown();
+			break;
+		case 'z':
+			ShiftLeft();
+			ShiftDown();
+			break;
+		case 'j':
+			Rotate();
+			break;
+		case 'k':
+			RRotate();
+			break;
+		default:
+			break;
+		}
+	}
+
+	getchar();
+	return 0;
+}
+
+void MySetCursorPos(int x, int y)
+{
+	COORD pos = { x, y };
+
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+
+	return;
+}
+
+COORD MyGetCursorPos(void)
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO curInfo;
+
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curPoint.X = curInfo.dwCursorPosition.X;
+	curPoint.Y = curInfo.dwCursorPosition.Y;
+
+	return curPoint;
+}
+
+void ShowBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf("■");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+void DeleteBlock(char blockInfo[4][4])
+{
+	int x, y;
+
+	COORD curPos = MyGetCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			MySetCursorPos(curPos.X + (x * 2), curPos.Y + y);
+
+			if (blockInfo[y][x] == 1)
+				printf(" ");
+		}
+
+	}
+
+	MySetCursorPos(curPos.X, curPos.Y);
+
+	return;
+}
+
+void RemoveCursor()
+
+{
+
+	CONSOLE_CURSOR_INFO curInfo;
+
+	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	curInfo.bVisible = 0;
+
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &curInfo);
+
+	return;
+}
+
+void ShiftRight()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosX += 2;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+
+	return;
+}
+
+void ShiftLeft()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosX -= 2;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+
+	return;
+}
+
+void ShiftDown()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosY++;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+	
+	return;
+
+}
+
+void Rotate()
+{
+	int base = blockID - blockID % 4;
+	DeleteBlock(blockModel[blockID]);
+	blockID = base + (blockID + 1) % 4;
+	ShowBlock(blockModel[blockID]);
+	
+	return;
+}
+
+void RRotate()
+{
+	int base = blockID - blockID % 4;
+	DeleteBlock(blockModel[blockID]);
+
+	if (blockID == base)
+		blockID += 3;
+	else
+		blockID--;
+
+	ShowBlock(blockModel[blockID]);
+
+	return;
+}
+
+void ShiftUp()
+{
+	DeleteBlock(blockModel[blockID]);
+	curPosY--;
+	MySetCursorPos(curPosX, curPosY);
+	ShowBlock(blockModel[blockID]);
+}
